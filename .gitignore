@@ -9,3 +9,6 @@ venv/
 .streamlit/secrets.toml
 ~$*
 *.log
+.tmp/
+.tools/
+.codex-run/

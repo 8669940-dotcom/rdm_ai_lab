@@ -1,0 +1,154 @@
+"""Generate report-ready process evidence from executed outputs, never inferred test labels."""
+from __future__ import annotations
+
+import json
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+import pandas as pd
+
+from rdm_model import FEATURE_LABELS, TARGET, load_data
+from scripts.rdm_common import ROOT, sha256
+
+
+def md_table(columns, rows):
+    def cell(value):
+        return str(value).replace("|", "/").replace("\n", " ")
+    return ["| " + " | ".join(map(cell, columns)) + " |", "| " + " | ".join("---" for _ in columns) + " |",
+            *["| " + " | ".join(map(cell, row)) + " |" for row in rows]]
+
+
+def main():
+    reports = ROOT / "reports"
+    result = json.loads((reports / "analysis_results.json").read_text(encoding="utf-8"))
+    profile = json.loads((reports / "data_profile.json").read_text(encoding="utf-8"))
+    raw = load_data()
+    train = raw[raw["_source"].eq("train")].copy()
+    train["정비 월"] = train["maintenance_date"].dt.month.astype(str).str.zfill(2)
+    train["fault_category"] = train["fault_category"].fillna("해당 없음")
+    eda = []
+    for field, label in [("equipment_type", "드론 유형"), ("정비 월", "정비 월"), ("fault_category", "고장 유형")]:
+        for category, group in train.groupby(field, sort=True):
+            eda.append({"기준": label, "구분": category, "정비 건수": len(group), "재고장 건수": int(group[TARGET].sum()),
+                        "재고장률": float(group[TARGET].mean())})
+    pd.DataFrame(eda).to_csv(reports / "eda_summary.csv", index=False, encoding="utf-8-sig")
+    metric, current = result["evaluation"]["metrics"], result["current"]
+    policies = result["threshold_policies"]
+    latest = [r for r in result["evaluation"]["monthly"] if r["unit"] == "latest_drone"]
+    lines = ["# 드론 예측정비 분석 과정과 보고 근거", "",
+             "교육용 가상 데이터 실습. 이 문서는 실행 결과를 바탕으로 최종 분석 보고서를 작성하기 위한 과정·판단·수치 출처 기록이다.",
+             "", "## 1. 목적과 현재 결과", "",
+             f"2026년 1월 정비 {current['records']}건을 최신 정비 기준 {current['candidates']}대로 정리하고, 재점검 {current['selected']}대를 선정했다. "
+             f"선택 모델은 `{result['selected_model']}`이며, 선택에 사용하지 않은 2024년 하반기 AP는 {metric['ap']:.4f}, ROC-AUC는 {metric['roc_auc']:.4f}다.",
+             "", f"위험 표시 {current['risk_flagged']}대, 정원 밖 위험 드론 {current['risk_outside_capacity']}대. "
+             "시험 2025년 1,241건은 예측만 생성했으며 성능은 강사 정답을 받기 전에는 알 수 없다.",
+             "", "출처: `analysis_results.json: selected_model, evaluation.metrics, current, test`. 앱도 같은 파일을 읽는다.",
+             "", "## 2. README 검토와 데이터 계약", "",
+             "업무 목적·비용·행 수를 유지하고 파일별 열, 월말 스냅샷, 30일 정답 성숙, 평가 단위, AP 정의와 비용 가정을 보완했다. "
+             "검토표는 `README_review.md`, 반영은 `../README.txt` 6절에 있다.", ""]
+    lines += md_table(["파일", "기간", "행", "드론", "열", "완전 중복", "드론·날짜 중복"], [
+        [name, f"{p['date_min']}~{p['date_max']}", p["rows"], p["unique_equipment"], p["column_count"],
+         p["exact_duplicate_extras"], p["equipment_date_duplicate_extras"]] for name, p in profile["files"].items()])
+    lines += ["", "원본은 변경하지 않았다. SHA-256 기준은 `data_manifest.json`, 현재 집계는 `data_profile.json`이다. "
+              "드론 ID 반복은 정상 이력이며 중복 행으로 제거하지 않았다.", "", "## 3. 결측·극단값 처리와 이유", "",
+              "- 학습 고장 코드·유형 각 1,707건, 시험 각 876건, 이번 달 각 62건의 공란은 모두 예방정비 기록에 위치한다. 해당 없음 범주로 구분하되 생성 규칙을 확인한 사실로 단정하지 않는다.",
+              "- 학습 경과일 공란 150건은 모두 관측 첫 정비다. 관측 이전 이력이 없는 상태를 표시하고 학습 구간 중앙값으로 대체했다. 0일로 단정하지 않았다.",
+              "- 학습 운용중단 시간 999시간·정비 비용 19,000만원이 관측됐다. 원본 행을 유지하고 학습 99백분위 상한 처리와 미처리를 앞 검증에서 비교했다.",
+              f"- 최종 구성의 상한 처리 사용 여부: {result['processing']['cap_enabled']}. 운영 모델의 학습 상한은 아래와 같다. 다른 분할의 상한도 해당 학습 구간에서만 학습했다.", ""]
+    lines += md_table(["컬럼", "운영 학습 상한", "학습 처리 셀", "시험 처리 셀", "이번 달 처리 셀"], [
+        [c, f"{value:.3f}", *[result["processing"]["operation_cap_counts_by_source"][source][c] for source in ("train", "test", "month")]]
+        for c, value in result["processing"]["operation_train_q99_caps"].items()])
+    lines += ["", "운영 상한 기준 셀 수는 운영 모델을 설명하는 집계다. 시험 제출 모델은 시험 시작 전 학습 구간에서 자체 상한을 학습하므로 위 시험 열의 수가 제출 모델의 실제 처리 수를 뜻하지 않는다.",
+              "수치 IQR은 검토 후보 탐색에만 사용했으며 등급·이진값은 IQR 후보로 표시하지 않았다. 원본 삭제 행은 0건이다.",
+              "", "## 4. 피처·컬럼 선택", "",
+              "현재 정비 직후 확정되는 정비 정보와 현재일 이전 동일 드론 이력만 사용했다. 과거 90일 정비·사후/긴급정비 수, 관측 고장 이후 경과일, "
+              "이전 예방정비 후 누적 비행시간 증가, 이전 180일 정비 실패 수를 만들었다. 이력 없는 상태는 별도 표시한다. "
+              "2025·2026년 이력은 앞 파일과 연결하고 정답을 쓰지 않는다.", "",
+              "기본 제외: 드론 ID는 이력·제출 식별자, 원 정비일은 정렬·월 주기 피처, 정답은 평가 대상, 월 가동률은 예측 직후 가용성 미확인 및 이번 달 열 부재다.",
+              "부대·고장 코드 포함 구성도 앞 검증에서 비교했다. 최종 포함 여부는 `selected_spec.context`와 비교표에 기록했다. "
+              "확률 가중치를 사람이 임의 지정하지 않았고, 모델이 학습한 규칙을 사용했다. 중요도는 별도 측정값이다.", "",
+              "사용 피처: " + ", ".join(FEATURE_LABELS.get(c, c) for c in result["processing"]["feature_columns"]),
+              "", "## 5. 시간 분할과 정답 성숙", ""]
+    lines += md_table(["역할", "학습 행", "학습 시작", "학습 마지막", "마지막 정답 관측 종료", "예측 시작"], [
+        [name, p["rows"], p["start"], p["end"], p["latest_label_end"], p["prediction_start"]] for name, p in result["splits"].items()])
+    lines += ["", f"모델·설정·위험 기준 선택: {result['development']['start']}~{result['development']['end']} "
+              f"({result['development']['metrics']['rows']}건). 추가 평가: 2024-07-01~12-31 ({metric['rows']}건). "
+              "정비일+30일이 다음 예측 시작일보다 앞선 학습 행만 사용했다. 2024년 6월 결과는 하반기 예측 모델 선택에 쓰지 않았다.",
+              "시험 제출 모델은 2025-01-01에 정답이 성숙한 2,223건으로 고정하고 2025년의 앞선 관측 기록만 이력에 반영했다. "
+              "2026년 운영 모델은 제공된 학습 정답 2,346건을 사용했다. 2025년 정답을 복원하거나 추가 학습하지 않았다.",
+              "", "## 6. 모델 비교와 선택", ""]
+    lines += md_table(["구성", "앞 검증 AP", "ROC-AUC", "Brier", "월20대 적중 합"], [
+        [r["key"], f"{r['ap']:.4f}", f"{r['roc_auc']:.4f}", f"{r['brier']:.4f}", r["latest_top20_hits"]]
+        for r in sorted(result["comparisons"], key=lambda r: -r["ap"])])
+    lines += ["", "AP 내림차순, 동률이면 최신 드론 월20대 적중·Brier·키 순으로 고정했다. 로지스틱 회귀, Random Forest, "
+              "HistGradientBoosting, LightGBM과 이력·부대/코드·상한 처리 대안을 비교했다. 하반기 성능을 보고 재선정하지 않았다. "
+              "선정 결과는 이번 고정 비교의 결과이며 다른 튜닝이나 실제 부대에서도 우수하다는 의미가 아니다.",
+              "", "## 7. 선택과 독립된 하반기 평가", "",
+              f"정비 기록 {metric['rows']}건·재고장 {metric['positives']}건 ({metric['prevalence']:.2%}). "
+              f"AP {metric['ap']:.4f}, 사다리꼴 PR-AUC {metric['pr_auc_trapezoid']:.4f}, ROC-AUC {metric['roc_auc']:.4f}, Brier {metric['brier']:.4f}.",
+              "", "AP는 확률 순위를 따라 재현율이 늘어날 때의 정밀도를 요약하며 정밀도·재현율의 균형을 본다. "
+              "ROC-AUC는 양성과 음성의 순위 구분력이다. 정원 제한이 있는 업무에서는 월별20대 적중과 함께 해석한다. "
+              "AP와 PR 곡선의 사다리꼴 면적은 계산법이 달라 이름을 구분한다. 정확도만으로 선정 품질을 판단하지 않았다.", ""]
+    lines += md_table(["월", "고유 후보", "후보 재고장", "모델20대 적중", "연수20대 적중", "무작위 평균"], [
+        [r["month"], r["candidates"], r["positives"], r["model_hits"], r["age_hits"], f"{r['random_hits_mean']:.2f}"] for r in latest])
+    lines += ["", f"6개월 적중 합: 모델 {sum(r['model_hits'] for r in latest)}건, 연수 {sum(r['age_hits'] for r in latest)}건, "
+              f"무작위 평균 {sum(r['random_hits_mean'] for r in latest):.2f}건. "
+              "무작위는 같은 월·후보 집단에서 1,000회 반복, 시드42와 월별 파생 시드다. 다른 월의 같은 드론 재선정은 별개 선정 사건이다. "
+              "정비 기록별 상위20건 평가는 `monthly_validation.csv`의 `unit=maintenance_record`, 운영 평가는 `latest_drone`으로 구분했다.",
+              "", "## 8. 위험 표시 기준과 비용", ""]
+    lines += md_table(["미탐지 비용(만원)", "앞 검증 선택 기준", "위험 표시 건", "FN", "앞 검증 비용(만원)", "뒤 검증 비용(만원)"], [
+        [key, f"{p['threshold']:.8f}" if p["threshold"] is not None else "표시 없음", p["flagged"], p["false_negatives"], p["cost"],
+         result["evaluation"]["frozen_policy_costs"][key]["cost"]] for key, p in policies.items()])
+    lines += ["", "검증 정비 건별 비용은 `FN×미탐지비용+flagged×60`(만원), 판정은 `prob >= threshold`다. "
+              "가능한 판정 변경점, 모두 표시/표시 안 함을 비교해 최소 비용을 골랐다. 동률은 표시 수가 적고 임계값이 큰 정책 순이다. "
+              "앞 검증 선택 기준을 뒤 검증에 고정 적용했으며 시험 데이터로 기준을 고르지 않았다.",
+              "정원 20대는 별도다. 운영 비용은 같은 최신 드론 후보에서 `미선정 재고장×300+선정대수×60`으로 별도 저장했다. "
+              "정원 제한 없는 표시 비용과 숫자를 직접 합산하지 않는다. 점검으로 선정 재고장을 예방한다는 단순 가정이며 실제 예방률·예산 절감의 증거가 아니다.",
+              "", "## 9. 2026년 1월 선정과 설명", "",
+              f"106건에서 최신 81대를 만들고 확률 순 {current['selected']}대를 선정했다. 위험 표시 기준은 {policies['300']['threshold']:.8f}, "
+              f"기준 이상 {current['risk_flagged']}대 중 {current['risk_outside_capacity']}대가 정원 밖이다. "
+              "초과 위험 드론은 확률 순 대기 명단으로 관리하고 운용 전 상태 확인·추가 점검 가능성을 정비반장이 판단한다.",
+              "개별 요인은 한 특성을 운영 학습 중앙값/최빈값으로 바꾼 예측 확률과의 차이다. "
+              "합산 기여도나 SHAP가 아니며, 상관·중복 특성으로 민감도가 가려지거나 중복될 수 있다. 인과 설명으로 해석하지 않는다. "
+              "검증 전체 중요도는 하반기 특성 셔플 5회에 따른 AP 감소로 별도 계산했다.",
+              "", "20대 명단과 권고: `reinspection_plan_2026-01.md`, 원 확률 CSV와 세부 요인은 `analysis_results.json: current.equipment`.",
+              "", "## 10. 산출물·검증·재현", "",
+              "```powershell", "python scripts/profile_data.py", "python scripts/train.py", "python scripts/build_report.py",
+              "python scripts/check.py --predictions reports/test_predictions_2025.csv", "python -m streamlit run app.py", "```", "",
+              "- 시험 예측: `test_predictions_2025.csv`, 3열·1,241행·원본 키 전량·유한 확률 검사.",
+              "- 앱과 보고서 공통 근거: `analysis_results.json`; 예측 모델과 카드: `../artifacts/`.",
+              "- 실행 환경: " + ", ".join(f"{k}={v}" for k, v in result["environment"].items()) + ". 의존성은 `../requirements.txt`에 고정했다.",
+              "- 데이터·코드 해시: `analysis_results.json: data_sha256, code_sha256`; 주요 산출물 해시: `output_manifest.json`.",
+              "- 실제 검증 결과: `check_result.json`, 앱 동작 테스트와 실행 서버 점검 기록. 준비 검사만으로 모델 성능을 보증하지 않는다.",
+              "", "## 11. 한계와 다음 검토", "",
+              "가상 데이터의 관측 결과이며 실제 기종·부대의 안전성을 보증하지 않는다. 반복 관측한 드론의 미래를 평가한 것으로 "
+              "처음 보는 드론·부대에 대한 이전 성능은 검증하지 않았다. 하반기 6개월의 변동과 시험 채점 단위도 확인해야 한다. "
+              "재학습한 모델의 확률 척도가 변할 수 있어 고정 임계값은 추가 보정·전향 검증이 필요하다. 실제 점검 개입 효과는 관측하지 않았다. "
+              "월말 최신 기록 계획을 월중 실시간 선제 배치 결과로 해석하지 않는다. 최종 판단은 정비 담당자가 한다.",
+              "", "## 방법 확인에 사용한 공식 문서", "",
+              "- [scikit-learn AP 정의](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.average_precision_score.html)",
+              "- [scikit-learn 시간 순서 검증](https://scikit-learn.org/stable/modules/cross_validation.html#time-series-split)",
+              "- [scikit-learn 순열 중요도와 상관 특성의 한계](https://scikit-learn.org/stable/modules/permutation_importance.html)", ""]
+    (reports / "analysis_process.md").write_text("\n".join(lines).replace("~", "–"), encoding="utf-8", newline="\n")
+    plan_lines = ["# 2026년 1월 드론 재점검 계획", "", f"제공 월말 스냅샷에서 최신 {current['candidates']}대 중 {current['selected']}대. "
+                  f"위험 표시 {current['risk_flagged']}대, 정원 밖 위험 {current['risk_outside_capacity']}대. 확률 내림차순, 동률 드론 번호 오름차순.", ""]
+    plan_lines += md_table(["순위", "드론", "유형", "부대", "최근 정비", "정비 구분", "확률", "상승 요인", "권고"], [
+        [r["rank"], r["equipment_id"], r["equipment_type"], r["unit_code"], r["maintenance_date"], r["maintenance_type"],
+         f"{r['prob']:.2%}", r["reason"], r["recommendation"]] for r in current["equipment"] if r["selected"]])
+    waiting = [r for r in current["equipment"] if r["risk_flag"] and not r["selected"]]
+    plan_lines += ["", "정원 밖 위험 대기: " + ", ".join(f"{r['equipment_id']} ({r['prob']:.2%})" for r in waiting),
+                   "", "정비반장이 확률 순 대기·운용 전 상태 확인·추가 점검 가능성을 검토한다. "
+                   "요인은 학습 참조값 치환 민감도이며 인과·가중치·합산 기여도가 아니다. 가상 데이터이고 실제 예방 효과는 검증하지 않았다.", ""]
+    (reports / "reinspection_plan_2026-01.md").write_text("\n".join(plan_lines), encoding="utf-8", newline="\n")
+    outputs = ["reports/analysis_results.json", "reports/test_predictions_2025.csv", "reports/reinspection_plan_2026-01.csv",
+               "reports/current_candidates_2026-01.csv", "reports/validation_predictions_2024H2.csv", "reports/monthly_validation.csv",
+               "reports/threshold_costs.csv", "reports/eda_summary.csv", "reports/analysis_process.md", "reports/reinspection_plan_2026-01.md",
+               "artifacts/rdm_model.joblib", "artifacts/submission_model.joblib", "artifacts/model_card.json"]
+    (reports / "output_manifest.json").write_text(json.dumps({p: sha256(ROOT / p) for p in outputs}, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
+    print("Saved EDA, analysis_process.md, reinspection plan and 13 output hashes.")
+
+
+if __name__ == "__main__":
+    main()

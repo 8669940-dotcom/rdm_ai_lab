@@ -1,5 +1,5 @@
 {
-  "checked_at_utc": "2026-11-17T04:41:44.588517+00:00",
+  "checked_at_utc": "2026-11-17T05:15:26.530877+00:00",
   "passed": true,
   "checks": [
     {
@@ -28,10 +28,15 @@
       "detail": "Project rules, skill, protocol and preparation log exist"
     },
     {
-      "name": "calculations",
+      "name": "automated_tests",
       "passed": true,
-      "detail": "11 calculation/submission contract tests passed"
+      "detail": "26 calculation, temporal, submission and UI tests passed"
+    },
+    {
+      "name": "test_submission",
+      "passed": true,
+      "detail": "OK"
     }
   ],
-  "scope": "Preparation checks only. This does not validate model performance or complete the assignment."
+  "scope": "Integrity, reproducibility, temporal and UI behavior checks. Educational validation metrics do not prove operational safety."
 }

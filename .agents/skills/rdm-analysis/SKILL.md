@@ -21,7 +21,7 @@ python scripts/profile_data.py
 python scripts/check.py
 ```
 
-준비 도구는 Python 표준 라이브러리만 사용한다. 원본을 읽고 `reports/`의 점검 파일을 갱신한다. `check.py --predictions <파일>`은 후속 시험 제출물의 전체 행·키·날짜·확률을 검사한다.
+프로필·기본 계산은 Python 표준 라이브러리만 사용한다. 학습과 분석 후 전체 검사는 프로젝트 `.venv`의 `requirements.txt` 환경에서 실행한다. `train.py` 후 `build_report.py`로 보고서와 산출물 해시를 갱신한다. `check.py --predictions <파일>`은 시험 제출물의 전체 행·키·날짜·확률도 검사한다.
 
 특정 계산을 임시 대화 코드로 반복하기보다 `scripts/`에 함수로 남긴다. 보고서용 계산은 입력·단위·기간·집계 단위를 명시하고, 최신 행 선정·확률 동률·비용 경계 등 중요한 성질을 작은 예제로 검증한다.
 

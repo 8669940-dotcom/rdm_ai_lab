@@ -89,27 +89,28 @@ def main() -> None:
         return "Project rules, skill, protocol and preparation log exist"
 
     def calculation_check():
-        suite = unittest.defaultTestLoader.discover(str(ROOT / "scripts"), pattern="test_rdm_common.py")
+        pattern = "test_*.py" if (ROOT / "reports/analysis_results.json").exists() else "test_rdm_common.py"
+        suite = unittest.defaultTestLoader.discover(str(ROOT / "scripts"), pattern=pattern)
         output = io.StringIO()
         result = unittest.TextTestRunner(stream=output).run(suite)
         if result.testsRun == 0 or not result.wasSuccessful():
             raise ValueError(output.getvalue())
-        return f"{result.testsRun} calculation/submission contract tests passed"
+        return f"{result.testsRun} calculation, temporal, submission and UI tests passed"
 
     run("configuration", config_check)
     run("original_integrity", integrity_check)
     run("data_contract", contract_check)
     run("profile_freshness", profile_check)
     run("preparation_documents", documentation_check)
-    run("calculations", calculation_check)
+    run("automated_tests", calculation_check)
     if args.predictions:
         run("test_submission", lambda: check_predictions(args.predictions.resolve()))
     summary = {"checked_at_utc": datetime.now(timezone.utc).isoformat(),
                "passed": all(item["passed"] for item in checks), "checks": checks,
-               "scope": "Preparation checks only. This does not validate model performance or complete the assignment."}
+               "scope": "Integrity, reproducibility, temporal and UI behavior checks. Educational validation metrics do not prove operational safety."}
     reports = ROOT / "reports"
     reports.mkdir(exist_ok=True)
-    (reports / "check_result.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    (reports / "check_result.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
     print(f"Checks: {sum(item['passed'] for item in checks)}/{len(checks)} passed")
     raise SystemExit(0 if summary["passed"] else 1)
 

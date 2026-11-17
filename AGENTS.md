@@ -42,18 +42,20 @@
 - PR-AUC는 계산 함수를 명시한다. `average_precision_score`(AP)와 사다리꼴 PR 곡선 면적을 혼용하지 않는다. ROC-AUC는 보조 지표, 정확도는 단독 근거로 쓰지 않는다.
 - 월별 20대 적중은 최신 기록 기준 드론 단위 운영 지표와 정비 건별 채점 집계를 구분한다. 강사의 월별 채점 단위가 미확정이므로 두 정의를 기록하고 추후 확인한다.
 - `drone_test.csv`와 이번 달 파일에는 정답이 없다. 실제 시험 PR-AUC·적중 수는 강사 결과를 받기 전 계산·추정·발명하지 않는다.
-- 위험 표시 임계값과 재점검 가능 대수는 별도 설정이다. `analysis_config.json`의 `risk_threshold: null`은 미선정 상태다. 다른 프로젝트의 0.16 등을 기본값으로 복사하지 않는다.
+- 위험 표시 임계값과 재점검 가능 대수는 별도 설정이다. `analysis_config.json`의 `risk_threshold: null`은 고정값을 지정하지 않고 검증 비용으로 선정한다는 뜻이다. 확정 결과는 `reports/analysis_results.json`의 `threshold_policies`에 저장하며 앱은 이를 기본값으로 읽는다. 다른 프로젝트의 임계값을 복사하지 않는다.
 - 임계값은 검증 기간에서 `FN × 300 + 기준 이상 건수 × 60`(만원)을 최소화하여 정하고, 미탐지 비용 600만원도 비교한다. 기준 비교는 `prob >= threshold`로 통일한다. 이는 정원 제한 없는 위험 표시 비용이며 상위 20대 운영 비용과 구분한다.
 - 정원이 20대라는 이유로 임계값 이상 수를 20대로 맞추지 않는다. 초과 위험 드론의 대기·정비반 검토 방안을 계획에 적는다.
 - 위험 요인의 설명은 검증한 모델의 개별 예측 기여도와 관측 사실을 구분한다. 인과관계·임의 가중치라고 단정하지 않는다. 최종 정비 판단은 담당자가 한다.
 
 ## 계산·검증 명령
 
-프로젝트 폴더에서 Python 3.10 이상으로 실행한다. 준비 도구는 표준 라이브러리만 사용한다.
+프로젝트 폴더의 전용 가상환경에서 실행한다. 프로필·기본 계산은 표준 라이브러리만 사용하며, 분석 산출물이 있으면 검사에 모델·Streamlit 테스트도 포함되어 `requirements.txt` 환경이 필요하다.
 
 ```powershell
 python scripts/profile_data.py --summary
 python scripts/profile_data.py
+python scripts/train.py
+python scripts/build_report.py
 python scripts/check.py
 python scripts/check.py --predictions reports/test_predictions_2025.csv
 ```
@@ -61,7 +63,7 @@ python scripts/check.py --predictions reports/test_predictions_2025.csv
 - 마지막 명령은 예측 파일을 만든 뒤 사용한다. `scripts/rdm_common.py`에 최신 행 선정, 확률 검증, 상위 대수 선정과 비용 계산을 모았다.
 - 코드 변경 후 `python scripts/check.py`의 실제 결과를 확인한다. 이 검사는 원본 해시·스키마·집계 재현·계산 테스트를 확인하며, 모델 성능이나 실습 전체 완료를 보증하지 않는다.
 - 실패 시 오류를 먼저 읽고 해당 단계만 재실행한다. 환경 진단과 복구는 프로젝트 스킬의 참조 문서를 따른다. 전역 Python·다른 프로젝트 환경을 임의로 바꾸지 않는다.
-- 후속 모델·앱 의존성은 별도 가상환경과 버전 파일로 관리한다. Streamlit 작업을 시작하면 설치 버전에 맞는 `developing-with-streamlit` 스킬을 적용한다.
+- 모델·앱 의존성은 `.venv`와 `requirements.txt`로, 타입 검사는 `requirements-dev.txt`로 관리한다. 재학습 후 보고서 생성기를 실행해 산출물 해시를 갱신한다. Streamlit 작업에는 설치 버전에 맞는 `developing-with-streamlit` 스킬을 적용한다.
 
 ## 산출물·근거·진행 기록
 

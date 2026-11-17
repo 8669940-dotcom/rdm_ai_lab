@@ -200,8 +200,8 @@ def main() -> None:
     if not args.summary:
         directory = ROOT / "reports"
         directory.mkdir(exist_ok=True)
-        (directory / "data_profile.json").write_text(json.dumps(profile, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-        (directory / "data_profile.md").write_text(markdown(profile), encoding="utf-8")
+        (directory / "data_profile.json").write_text(json.dumps(profile, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
+        (directory / "data_profile.md").write_text(markdown(profile), encoding="utf-8", newline="\n")
     for name, item in profile["files"].items():
         print(f"{name}: rows={item['rows']}, equipment={item['unique_equipment']}, "
               f"duplicates={item['exact_duplicate_extras']}, target={'present' if item['target_counts'] else 'absent'}")

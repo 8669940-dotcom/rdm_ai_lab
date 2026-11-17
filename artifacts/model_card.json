@@ -1,0 +1,147 @@
+{
+  "created_at_utc": "2026-11-17T05:15:10.077415+00:00",
+  "selected_model": "rf_history_cap",
+  "selected_spec": {
+    "key": "rf_history_cap",
+    "kind": "random_forest",
+    "history": true,
+    "context": false,
+    "cap": true
+  },
+  "environment": {
+    "python": "3.12.10",
+    "pandas": "3.1.1",
+    "numpy": "2.5.5",
+    "scikit_learn": "1.9.1",
+    "streamlit": "1.67.0"
+  },
+  "splits": {
+    "development_train": {
+      "rows": 980,
+      "start": "2023-01-01",
+      "end": "2023-12-01",
+      "prediction_start": "2024-01-01",
+      "latest_label_end": "2023-12-31"
+    },
+    "evaluation_train": {
+      "rows": 1611,
+      "start": "2023-01-01",
+      "end": "2024-05-31",
+      "prediction_start": "2024-07-01",
+      "latest_label_end": "2024-06-30"
+    },
+    "submission_train": {
+      "rows": 2223,
+      "start": "2023-01-01",
+      "end": "2024-12-01",
+      "prediction_start": "2025-01-01",
+      "latest_label_end": "2024-12-31"
+    },
+    "operation_train": {
+      "rows": 2346,
+      "start": "2023-01-01",
+      "end": "2024-12-31",
+      "prediction_start": "2026-01-01",
+      "latest_label_end": "2025-01-30"
+    }
+  },
+  "threshold_policies": {
+    "300": {
+      "threshold": 0.40140788483944695,
+      "policy": "threshold",
+      "flagged": 111,
+      "true_positives": 74,
+      "false_negatives": 40,
+      "cost": 18660,
+      "miss_cost": 300,
+      "inspection_cost": 60,
+      "unit": "maintenance_record"
+    },
+    "600": {
+      "threshold": 0.22762209934496863,
+      "policy": "threshold",
+      "flagged": 182,
+      "true_positives": 87,
+      "false_negatives": 27,
+      "cost": 27120,
+      "miss_cost": 600,
+      "inspection_cost": 60,
+      "unit": "maintenance_record"
+    }
+  },
+  "processing": {
+    "removed_rows": 0,
+    "cap_enabled": true,
+    "operation_train_q99_caps": {
+      "downtime_hours": 40.27500000000009,
+      "maintenance_cost": 386.0
+    },
+    "operation_cap_counts_by_source": {
+      "train": {
+        "downtime_hours": 24,
+        "maintenance_cost": 23
+      },
+      "test": {
+        "downtime_hours": 21,
+        "maintenance_cost": 8
+      },
+      "month": {
+        "downtime_hours": 2,
+        "maintenance_cost": 1
+      }
+    },
+    "numeric_imputation": "Median and missing indicators fitted only on each training period",
+    "categorical_imputation": "Preventive fault blanks: 해당 없음; other fault blanks: 미기재",
+    "excluded": {
+      "equipment_id": "Identifier for history and submission; excluded from input",
+      "maintenance_date": "Ordering and calendar features only",
+      "availability_rate": "Monthly end value unavailable after maintenance; absent in January input",
+      "failure_within_30days": "Outcome, never a predictor",
+      "unit_code": "Context-feature alternative lost on development AP",
+      "fault_code": "Context-feature alternative lost on development AP"
+    },
+    "feature_columns": [
+      "equipment_age_years",
+      "severity",
+      "downtime_hours",
+      "repair_duration_hours",
+      "parts_replaced_count",
+      "maintenance_cost",
+      "maintenance_success",
+      "cumulative_operating_hours",
+      "days_since_last_maintenance",
+      "gap_missing",
+      "month_sin",
+      "month_cos",
+      "prior_maintenance_count",
+      "prior_maintenance_90d",
+      "prior_faults_90d",
+      "days_since_prior_fault",
+      "has_prior_fault",
+      "flight_hours_since_preventive",
+      "has_prior_preventive",
+      "prior_unsuccessful_180d",
+      "equipment_type",
+      "maintenance_type",
+      "fault_category"
+    ]
+  },
+  "data_sha256": {
+    "data/drone_train.csv": "26c4d3711fd5c91dc183815af83ba5af6107b6470ae2d3660da2a50586136121",
+    "data/drone_test.csv": "5fa789dd8111ce5c3303e9a5c9f0694aec409a1c3a504574cc2ab2386ece7a7e",
+    "data/drone_this_month.csv": "379631f03af5139d8a0c5c7278d812b7892da022a4d7650488eafe5ff564e346"
+  },
+  "code_sha256": {
+    "rdm_model.py": "b4f8dc47706360cc831c95d45d618b9842d136499fdb82b6905ca525eaf511b6",
+    "scripts/train.py": "2527e45a5364bc1ab74178c248b4984051d4fec635b782750a63be77c438099c",
+    "analysis_config.json": "e9f9bae4575a639e6ab8164d78a9537f0c7160b364b2b8cc420c060203b7937d"
+  },
+  "limitations": [
+    "Educational synthetic data; performance is not evidence of operational safety or actual savings.",
+    "Instructor test labels and grading unit are unavailable; no 2025 performance is reported.",
+    "Refitting changes probability scale; the frozen development threshold may drift and needs prospective calibration.",
+    "Monthly latest-record snapshots are retrospective month-end plans, not live daily dispatch decisions.",
+    "No actual intervention outcome; cost comparison assumes selected re-failures could be prevented.",
+    "Repeated equipment are present in chronological splits; transfer to unseen equipment/units is untested."
+  ]
+}

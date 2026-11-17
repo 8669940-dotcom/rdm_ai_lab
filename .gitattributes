@@ -4,5 +4,7 @@
 *.txt text eol=lf
 *.json text eol=lf
 *.toml text eol=lf
-*.csv -text
+.gitattributes text eol=lf
+.gitignore text eol=lf
+*.csv -text whitespace=trailing-space,space-before-tab,cr-at-eol
 *.joblib binary
