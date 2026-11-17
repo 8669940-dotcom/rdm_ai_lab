@@ -1,0 +1,6 @@
+{
+  "description": "Initial SHA-256 baseline. Do not replace hashes to silence a check failure.",
+  "data/drone_train.csv": "26c4d3711fd5c91dc183815af83ba5af6107b6470ae2d3660da2a50586136121",
+  "data/drone_test.csv": "5fa789dd8111ce5c3303e9a5c9f0694aec409a1c3a504574cc2ab2386ece7a7e",
+  "data/drone_this_month.csv": "379631f03af5139d8a0c5c7278d812b7892da022a4d7650488eafe5ff564e346"
+}

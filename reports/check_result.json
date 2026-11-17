@@ -1,0 +1,37 @@
+{
+  "checked_at_utc": "2026-11-17T04:30:21.005229+00:00",
+  "passed": true,
+  "checks": [
+    {
+      "name": "configuration",
+      "passed": true,
+      "detail": "month=2026-01, capacity=20, threshold=None"
+    },
+    {
+      "name": "original_integrity",
+      "passed": true,
+      "detail": "SHA-256 matched for all 3 original CSVs"
+    },
+    {
+      "name": "data_contract",
+      "passed": true,
+      "detail": "train=2346, test=1241, month=106; held-out targets absent"
+    },
+    {
+      "name": "profile_freshness",
+      "passed": true,
+      "detail": "Saved profile matches a fresh calculation"
+    },
+    {
+      "name": "preparation_documents",
+      "passed": true,
+      "detail": "Project rules, skill, protocol and preparation log exist"
+    },
+    {
+      "name": "calculations",
+      "passed": true,
+      "detail": "11 calculation/submission contract tests passed"
+    }
+  ],
+  "scope": "Preparation checks only. This does not validate model performance or complete the assignment."
+}

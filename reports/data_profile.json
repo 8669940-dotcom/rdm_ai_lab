@@ -1,0 +1,845 @@
+{
+  "schema_version": 1,
+  "purpose": "Analysis preparation only; no model scores or held-out labels are available.",
+  "files": {
+    "drone_train.csv": {
+      "path": "data/drone_train.csv",
+      "sha256": "26c4d3711fd5c91dc183815af83ba5af6107b6470ae2d3660da2a50586136121",
+      "rows": 2346,
+      "columns": [
+        "equipment_id",
+        "equipment_type",
+        "unit_code",
+        "equipment_age_years",
+        "maintenance_date",
+        "maintenance_type",
+        "fault_code",
+        "fault_category",
+        "severity",
+        "downtime_hours",
+        "repair_duration_hours",
+        "parts_replaced_count",
+        "maintenance_cost",
+        "maintenance_success",
+        "cumulative_operating_hours",
+        "days_since_last_maintenance",
+        "availability_rate",
+        "failure_within_30days"
+      ],
+      "column_count": 18,
+      "date_min": "2023-01-01",
+      "date_max": "2024-12-31",
+      "invalid_date_lines": [],
+      "unique_equipment": 150,
+      "equipment_types": {
+        "감시드론": 581,
+        "교육용드론": 381,
+        "수송드론": 601,
+        "정찰드론": 783
+      },
+      "unique_units": 12,
+      "month_counts": {
+        "2023-01": 51,
+        "2023-02": 63,
+        "2023-03": 109,
+        "2023-04": 70,
+        "2023-05": 93,
+        "2023-06": 86,
+        "2023-07": 111,
+        "2023-08": 112,
+        "2023-09": 100,
+        "2023-10": 93,
+        "2023-11": 87,
+        "2023-12": 125,
+        "2024-01": 115,
+        "2024-02": 111,
+        "2024-03": 91,
+        "2024-04": 86,
+        "2024-05": 108,
+        "2024-06": 92,
+        "2024-07": 96,
+        "2024-08": 103,
+        "2024-09": 98,
+        "2024-10": 117,
+        "2024-11": 101,
+        "2024-12": 128
+      },
+      "exact_duplicate_extras": 0,
+      "equipment_date_duplicate_extras": 0,
+      "missing": {
+        "equipment_id": 0,
+        "equipment_type": 0,
+        "unit_code": 0,
+        "equipment_age_years": 0,
+        "maintenance_date": 0,
+        "maintenance_type": 0,
+        "fault_code": 1707,
+        "fault_category": 1707,
+        "severity": 0,
+        "downtime_hours": 0,
+        "repair_duration_hours": 0,
+        "parts_replaced_count": 0,
+        "maintenance_cost": 0,
+        "maintenance_success": 0,
+        "cumulative_operating_hours": 0,
+        "days_since_last_maintenance": 150,
+        "availability_rate": 0,
+        "failure_within_30days": 0
+      },
+      "missing_by_maintenance_type": {
+        "긴급정비": {
+          "rows": 171,
+          "fault_code_missing": 0,
+          "fault_category_missing": 0
+        },
+        "사후정비": {
+          "rows": 468,
+          "fault_code_missing": 0,
+          "fault_category_missing": 0
+        },
+        "예방정비": {
+          "rows": 1707,
+          "fault_code_missing": 1707,
+          "fault_category_missing": 1707
+        }
+      },
+      "numeric": {
+        "equipment_age_years": {
+          "n": 2346,
+          "invalid": 0,
+          "min": 0.6,
+          "q1": 3.1,
+          "median": 4.4,
+          "q3": 5.6,
+          "max": 7.9,
+          "negative": 0,
+          "iqr_flags": 0
+        },
+        "severity": {
+          "n": 2346,
+          "invalid": 0,
+          "min": 0.0,
+          "q1": 0.0,
+          "median": 0.0,
+          "q3": 1.0,
+          "max": 5.0,
+          "negative": 0,
+          "iqr_flags": null,
+          "domain_invalid": 0
+        },
+        "downtime_hours": {
+          "n": 2346,
+          "invalid": 0,
+          "min": 0.5,
+          "q1": 2.025,
+          "median": 3.5,
+          "q3": 5.0,
+          "max": 999.0,
+          "negative": 0,
+          "iqr_flags": 425
+        },
+        "repair_duration_hours": {
+          "n": 2346,
+          "invalid": 0,
+          "min": 0.2,
+          "q1": 1.2,
+          "median": 2.0,
+          "q3": 3.3,
+          "max": 55.9,
+          "negative": 0,
+          "iqr_flags": 345
+        },
+        "parts_replaced_count": {
+          "n": 2346,
+          "invalid": 0,
+          "min": 0.0,
+          "q1": 0.0,
+          "median": 0.0,
+          "q3": 1.0,
+          "max": 10.0,
+          "negative": 0,
+          "iqr_flags": 253,
+          "domain_invalid": 0
+        },
+        "maintenance_cost": {
+          "n": 2346,
+          "invalid": 0,
+          "min": 8.0,
+          "q1": 16.0,
+          "median": 23.0,
+          "q3": 49.0,
+          "max": 19000.0,
+          "negative": 0,
+          "iqr_flags": 434
+        },
+        "maintenance_success": {
+          "n": 2346,
+          "invalid": 0,
+          "min": 0.0,
+          "q1": 1.0,
+          "median": 1.0,
+          "q3": 1.0,
+          "max": 1.0,
+          "negative": 0,
+          "iqr_flags": null,
+          "domain_invalid": 0
+        },
+        "cumulative_operating_hours": {
+          "n": 2346,
+          "invalid": 0,
+          "min": 140.3,
+          "q1": 932.475,
+          "median": 1363.4,
+          "q3": 1810.975,
+          "max": 3542.6,
+          "negative": 0,
+          "iqr_flags": 8
+        },
+        "days_since_last_maintenance": {
+          "n": 2196,
+          "invalid": 0,
+          "min": 1.0,
+          "q1": 21.0,
+          "median": 51.0,
+          "q3": 64.0,
+          "max": 94.0,
+          "negative": 0,
+          "iqr_flags": 0
+        },
+        "availability_rate": {
+          "n": 2346,
+          "invalid": 0,
+          "min": 0.3,
+          "q1": 0.92225,
+          "median": 0.965,
+          "q3": 0.977,
+          "max": 0.998,
+          "negative": 0,
+          "iqr_flags": 307,
+          "domain_invalid": 0
+        }
+      },
+      "largest_value_examples": {
+        "downtime_hours": [
+          {
+            "csv_line": 211,
+            "equipment_id": "DR-0014",
+            "maintenance_date": "2024-10-14",
+            "maintenance_type": "사후정비",
+            "value": 999.0
+          },
+          {
+            "csv_line": 1169,
+            "equipment_id": "DR-0074",
+            "maintenance_date": "2024-01-27",
+            "maintenance_type": "사후정비",
+            "value": 999.0
+          },
+          {
+            "csv_line": 1861,
+            "equipment_id": "DR-0115",
+            "maintenance_date": "2024-05-02",
+            "maintenance_type": "사후정비",
+            "value": 999.0
+          }
+        ],
+        "repair_duration_hours": [
+          {
+            "csv_line": 493,
+            "equipment_id": "DR-0034",
+            "maintenance_date": "2024-01-05",
+            "maintenance_type": "긴급정비",
+            "value": 55.9
+          },
+          {
+            "csv_line": 2017,
+            "equipment_id": "DR-0125",
+            "maintenance_date": "2023-07-03",
+            "maintenance_type": "긴급정비",
+            "value": 36.4
+          },
+          {
+            "csv_line": 706,
+            "equipment_id": "DR-0046",
+            "maintenance_date": "2024-02-25",
+            "maintenance_type": "사후정비",
+            "value": 33.5
+          }
+        ],
+        "maintenance_cost": [
+          {
+            "csv_line": 1816,
+            "equipment_id": "DR-0115",
+            "maintenance_date": "2023-08-14",
+            "maintenance_type": "사후정비",
+            "value": 19000.0
+          },
+          {
+            "csv_line": 1410,
+            "equipment_id": "DR-0088",
+            "maintenance_date": "2023-11-03",
+            "maintenance_type": "사후정비",
+            "value": 18300.0
+          },
+          {
+            "csv_line": 839,
+            "equipment_id": "DR-0054",
+            "maintenance_date": "2023-03-23",
+            "maintenance_type": "사후정비",
+            "value": 16800.0
+          }
+        ]
+      },
+      "target_counts": {
+        "0": 1821,
+        "1": 525
+      },
+      "target_positive_rate": 0.2237851662404092
+    },
+    "drone_test.csv": {
+      "path": "data/drone_test.csv",
+      "sha256": "5fa789dd8111ce5c3303e9a5c9f0694aec409a1c3a504574cc2ab2386ece7a7e",
+      "rows": 1241,
+      "columns": [
+        "equipment_id",
+        "equipment_type",
+        "unit_code",
+        "equipment_age_years",
+        "maintenance_date",
+        "maintenance_type",
+        "fault_code",
+        "fault_category",
+        "severity",
+        "downtime_hours",
+        "repair_duration_hours",
+        "parts_replaced_count",
+        "maintenance_cost",
+        "maintenance_success",
+        "cumulative_operating_hours",
+        "days_since_last_maintenance",
+        "availability_rate"
+      ],
+      "column_count": 17,
+      "date_min": "2025-01-01",
+      "date_max": "2025-12-31",
+      "invalid_date_lines": [],
+      "unique_equipment": 150,
+      "equipment_types": {
+        "감시드론": 311,
+        "교육용드론": 179,
+        "수송드론": 348,
+        "정찰드론": 403
+      },
+      "unique_units": 12,
+      "month_counts": {
+        "2025-01": 124,
+        "2025-02": 96,
+        "2025-03": 104,
+        "2025-04": 86,
+        "2025-05": 101,
+        "2025-06": 114,
+        "2025-07": 131,
+        "2025-08": 105,
+        "2025-09": 92,
+        "2025-10": 89,
+        "2025-11": 79,
+        "2025-12": 120
+      },
+      "exact_duplicate_extras": 0,
+      "equipment_date_duplicate_extras": 0,
+      "missing": {
+        "equipment_id": 0,
+        "equipment_type": 0,
+        "unit_code": 0,
+        "equipment_age_years": 0,
+        "maintenance_date": 0,
+        "maintenance_type": 0,
+        "fault_code": 876,
+        "fault_category": 876,
+        "severity": 0,
+        "downtime_hours": 0,
+        "repair_duration_hours": 0,
+        "parts_replaced_count": 0,
+        "maintenance_cost": 0,
+        "maintenance_success": 0,
+        "cumulative_operating_hours": 0,
+        "days_since_last_maintenance": 0,
+        "availability_rate": 0
+      },
+      "missing_by_maintenance_type": {
+        "긴급정비": {
+          "rows": 86,
+          "fault_code_missing": 0,
+          "fault_category_missing": 0
+        },
+        "사후정비": {
+          "rows": 279,
+          "fault_code_missing": 0,
+          "fault_category_missing": 0
+        },
+        "예방정비": {
+          "rows": 876,
+          "fault_code_missing": 876,
+          "fault_category_missing": 876
+        }
+      },
+      "numeric": {
+        "equipment_age_years": {
+          "n": 1241,
+          "invalid": 0,
+          "min": 2.5,
+          "q1": 4.7,
+          "median": 5.8,
+          "q3": 7.0,
+          "max": 8.9,
+          "negative": 0,
+          "iqr_flags": 0
+        },
+        "severity": {
+          "n": 1241,
+          "invalid": 0,
+          "min": 0.0,
+          "q1": 0.0,
+          "median": 0.0,
+          "q3": 2.0,
+          "max": 5.0,
+          "negative": 0,
+          "iqr_flags": null,
+          "domain_invalid": 0
+        },
+        "downtime_hours": {
+          "n": 1241,
+          "invalid": 0,
+          "min": 0.5,
+          "q1": 2.0,
+          "median": 3.6,
+          "q3": 6.6,
+          "max": 61.8,
+          "negative": 0,
+          "iqr_flags": 196
+        },
+        "repair_duration_hours": {
+          "n": 1241,
+          "invalid": 0,
+          "min": 0.2,
+          "q1": 1.2,
+          "median": 2.1,
+          "q3": 3.6,
+          "max": 41.9,
+          "negative": 0,
+          "iqr_flags": 186
+        },
+        "parts_replaced_count": {
+          "n": 1241,
+          "invalid": 0,
+          "min": 0.0,
+          "q1": 0.0,
+          "median": 0.0,
+          "q3": 1.0,
+          "max": 9.0,
+          "negative": 0,
+          "iqr_flags": 146,
+          "domain_invalid": 0
+        },
+        "maintenance_cost": {
+          "n": 1241,
+          "invalid": 0,
+          "min": 8.0,
+          "q1": 16.0,
+          "median": 24.0,
+          "q3": 69.0,
+          "max": 611.0,
+          "negative": 0,
+          "iqr_flags": 158
+        },
+        "maintenance_success": {
+          "n": 1241,
+          "invalid": 0,
+          "min": 0.0,
+          "q1": 1.0,
+          "median": 1.0,
+          "q3": 1.0,
+          "max": 1.0,
+          "negative": 0,
+          "iqr_flags": null,
+          "domain_invalid": 0
+        },
+        "cumulative_operating_hours": {
+          "n": 1241,
+          "invalid": 0,
+          "min": 758.1,
+          "q1": 1650.7,
+          "median": 2131.6,
+          "q3": 2472.7,
+          "max": 4270.7,
+          "negative": 0,
+          "iqr_flags": 10
+        },
+        "days_since_last_maintenance": {
+          "n": 1241,
+          "invalid": 0,
+          "min": 1.0,
+          "q1": 19.0,
+          "median": 51.0,
+          "q3": 65.0,
+          "max": 94.0,
+          "negative": 0,
+          "iqr_flags": 0
+        },
+        "availability_rate": {
+          "n": 1241,
+          "invalid": 0,
+          "min": 0.3,
+          "q1": 0.904,
+          "median": 0.965,
+          "q3": 0.976,
+          "max": 0.997,
+          "negative": 0,
+          "iqr_flags": 158,
+          "domain_invalid": 0
+        }
+      },
+      "largest_value_examples": {
+        "downtime_hours": [
+          {
+            "csv_line": 928,
+            "equipment_id": "DR-0108",
+            "maintenance_date": "2025-09-04",
+            "maintenance_type": "사후정비",
+            "value": 61.8
+          },
+          {
+            "csv_line": 487,
+            "equipment_id": "DR-0060",
+            "maintenance_date": "2025-12-31",
+            "maintenance_type": "긴급정비",
+            "value": 61.0
+          },
+          {
+            "csv_line": 990,
+            "equipment_id": "DR-0115",
+            "maintenance_date": "2025-04-05",
+            "maintenance_type": "사후정비",
+            "value": 52.7
+          }
+        ],
+        "repair_duration_hours": [
+          {
+            "csv_line": 990,
+            "equipment_id": "DR-0115",
+            "maintenance_date": "2025-04-05",
+            "maintenance_type": "사후정비",
+            "value": 41.9
+          },
+          {
+            "csv_line": 634,
+            "equipment_id": "DR-0076",
+            "maintenance_date": "2025-12-20",
+            "maintenance_type": "긴급정비",
+            "value": 33.9
+          },
+          {
+            "csv_line": 989,
+            "equipment_id": "DR-0115",
+            "maintenance_date": "2025-03-16",
+            "maintenance_type": "사후정비",
+            "value": 32.2
+          }
+        ],
+        "maintenance_cost": [
+          {
+            "csv_line": 397,
+            "equipment_id": "DR-0049",
+            "maintenance_date": "2025-12-07",
+            "maintenance_type": "긴급정비",
+            "value": 611.0
+          },
+          {
+            "csv_line": 681,
+            "equipment_id": "DR-0082",
+            "maintenance_date": "2025-08-04",
+            "maintenance_type": "긴급정비",
+            "value": 571.0
+          },
+          {
+            "csv_line": 1133,
+            "equipment_id": "DR-0132",
+            "maintenance_date": "2025-10-24",
+            "maintenance_type": "긴급정비",
+            "value": 556.0
+          }
+        ]
+      },
+      "target_counts": null,
+      "target_positive_rate": null
+    },
+    "drone_this_month.csv": {
+      "path": "data/drone_this_month.csv",
+      "sha256": "379631f03af5139d8a0c5c7278d812b7892da022a4d7650488eafe5ff564e346",
+      "rows": 106,
+      "columns": [
+        "equipment_id",
+        "equipment_type",
+        "unit_code",
+        "equipment_age_years",
+        "maintenance_date",
+        "maintenance_type",
+        "fault_code",
+        "fault_category",
+        "severity",
+        "downtime_hours",
+        "repair_duration_hours",
+        "parts_replaced_count",
+        "maintenance_cost",
+        "maintenance_success",
+        "cumulative_operating_hours",
+        "days_since_last_maintenance"
+      ],
+      "column_count": 16,
+      "date_min": "2026-01-01",
+      "date_max": "2026-01-31",
+      "invalid_date_lines": [],
+      "unique_equipment": 81,
+      "equipment_types": {
+        "감시드론": 24,
+        "교육용드론": 17,
+        "수송드론": 24,
+        "정찰드론": 41
+      },
+      "unique_units": 12,
+      "month_counts": {
+        "2026-01": 106
+      },
+      "exact_duplicate_extras": 0,
+      "equipment_date_duplicate_extras": 0,
+      "missing": {
+        "equipment_id": 0,
+        "equipment_type": 0,
+        "unit_code": 0,
+        "equipment_age_years": 0,
+        "maintenance_date": 0,
+        "maintenance_type": 0,
+        "fault_code": 62,
+        "fault_category": 62,
+        "severity": 0,
+        "downtime_hours": 0,
+        "repair_duration_hours": 0,
+        "parts_replaced_count": 0,
+        "maintenance_cost": 0,
+        "maintenance_success": 0,
+        "cumulative_operating_hours": 0,
+        "days_since_last_maintenance": 0
+      },
+      "missing_by_maintenance_type": {
+        "긴급정비": {
+          "rows": 13,
+          "fault_code_missing": 0,
+          "fault_category_missing": 0
+        },
+        "사후정비": {
+          "rows": 31,
+          "fault_code_missing": 0,
+          "fault_category_missing": 0
+        },
+        "예방정비": {
+          "rows": 62,
+          "fault_code_missing": 62,
+          "fault_category_missing": 62
+        }
+      },
+      "numeric": {
+        "equipment_age_years": {
+          "n": 106,
+          "invalid": 0,
+          "min": 3.5,
+          "q1": 5.3,
+          "median": 6.4,
+          "q3": 7.574999999999999,
+          "max": 9.0,
+          "negative": 0,
+          "iqr_flags": 0
+        },
+        "severity": {
+          "n": 106,
+          "invalid": 0,
+          "min": 0.0,
+          "q1": 0.0,
+          "median": 0.0,
+          "q3": 2.0,
+          "max": 5.0,
+          "negative": 0,
+          "iqr_flags": null,
+          "domain_invalid": 0
+        },
+        "downtime_hours": {
+          "n": 106,
+          "invalid": 0,
+          "min": 0.6,
+          "q1": 2.5,
+          "median": 4.0,
+          "q3": 8.600000000000001,
+          "max": 56.0,
+          "negative": 0,
+          "iqr_flags": 16
+        },
+        "repair_duration_hours": {
+          "n": 106,
+          "invalid": 0,
+          "min": 0.3,
+          "q1": 1.325,
+          "median": 2.4,
+          "q3": 4.074999999999999,
+          "max": 26.6,
+          "negative": 0,
+          "iqr_flags": 18
+        },
+        "parts_replaced_count": {
+          "n": 106,
+          "invalid": 0,
+          "min": 0.0,
+          "q1": 0.0,
+          "median": 0.0,
+          "q3": 2.0,
+          "max": 7.0,
+          "negative": 0,
+          "iqr_flags": 4,
+          "domain_invalid": 0
+        },
+        "maintenance_cost": {
+          "n": 106,
+          "invalid": 0,
+          "min": 8.0,
+          "q1": 18.0,
+          "median": 25.5,
+          "q3": 126.5,
+          "max": 452.0,
+          "negative": 0,
+          "iqr_flags": 5
+        },
+        "maintenance_success": {
+          "n": 106,
+          "invalid": 0,
+          "min": 0.0,
+          "q1": 1.0,
+          "median": 1.0,
+          "q3": 1.0,
+          "max": 1.0,
+          "negative": 0,
+          "iqr_flags": null,
+          "domain_invalid": 0
+        },
+        "cumulative_operating_hours": {
+          "n": 106,
+          "invalid": 0,
+          "min": 1000.8,
+          "q1": 1900.675,
+          "median": 2410.75,
+          "q3": 2780.8,
+          "max": 4172.1,
+          "negative": 0,
+          "iqr_flags": 2
+        },
+        "days_since_last_maintenance": {
+          "n": 106,
+          "invalid": 0,
+          "min": 1.0,
+          "q1": 12.25,
+          "median": 44.0,
+          "q3": 59.0,
+          "max": 85.0,
+          "negative": 0,
+          "iqr_flags": 0
+        }
+      },
+      "largest_value_examples": {
+        "downtime_hours": [
+          {
+            "csv_line": 52,
+            "equipment_id": "DR-0061",
+            "maintenance_date": "2026-01-16",
+            "maintenance_type": "긴급정비",
+            "value": 56.0
+          },
+          {
+            "csv_line": 66,
+            "equipment_id": "DR-0083",
+            "maintenance_date": "2026-01-11",
+            "maintenance_type": "긴급정비",
+            "value": 43.5
+          },
+          {
+            "csv_line": 75,
+            "equipment_id": "DR-0101",
+            "maintenance_date": "2026-01-23",
+            "maintenance_type": "사후정비",
+            "value": 39.0
+          }
+        ],
+        "repair_duration_hours": [
+          {
+            "csv_line": 52,
+            "equipment_id": "DR-0061",
+            "maintenance_date": "2026-01-16",
+            "maintenance_type": "긴급정비",
+            "value": 26.6
+          },
+          {
+            "csv_line": 15,
+            "equipment_id": "DR-0017",
+            "maintenance_date": "2026-01-21",
+            "maintenance_type": "긴급정비",
+            "value": 26.4
+          },
+          {
+            "csv_line": 96,
+            "equipment_id": "DR-0132",
+            "maintenance_date": "2026-01-21",
+            "maintenance_type": "긴급정비",
+            "value": 26.3
+          }
+        ],
+        "maintenance_cost": [
+          {
+            "csv_line": 15,
+            "equipment_id": "DR-0017",
+            "maintenance_date": "2026-01-21",
+            "maintenance_type": "긴급정비",
+            "value": 452.0
+          },
+          {
+            "csv_line": 84,
+            "equipment_id": "DR-0115",
+            "maintenance_date": "2026-01-04",
+            "maintenance_type": "사후정비",
+            "value": 376.0
+          },
+          {
+            "csv_line": 96,
+            "equipment_id": "DR-0132",
+            "maintenance_date": "2026-01-21",
+            "maintenance_type": "긴급정비",
+            "value": 362.0
+          }
+        ]
+      },
+      "target_counts": null,
+      "target_positive_rate": null
+    }
+  },
+  "history_checks": {
+    "unique_equipment_all_files": 150,
+    "equipment_date_duplicate_extras_all_files": 0,
+    "first_observed_gap_missing": {
+      "drone_train.csv": 150
+    },
+    "nonfirst_gap_missing": {},
+    "observed_gap_mismatches": {},
+    "cumulative_hours_decreases": {}
+  },
+  "current_month": {
+    "rows": 106,
+    "latest_unique_candidates": 81,
+    "equipment_with_multiple_records": 18,
+    "earlier_records_not_used_for_selection": 25
+  }
+}

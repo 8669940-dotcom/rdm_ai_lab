@@ -1,0 +1,11 @@
+{
+  "report_month": "2026-01",
+  "capacity": 20,
+  "cost_unit": "만원",
+  "miss_costs": [300, 600],
+  "inspection_cost": 60,
+  "risk_threshold": null,
+  "validation_start": "2024-07-01",
+  "label_horizon_days": 30,
+  "random_seed": 42
+}
