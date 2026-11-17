@@ -14,7 +14,7 @@ import pandas as pd
 from pandas.testing import assert_frame_equal
 
 from app_helpers import filter_frame, plan_frame, sorted_frame
-from rdm_model import QuantileCapper, TARGET, build_features, cost_sweep, load_data, metrics
+from rdm_model import QuartileRepairer, TARGET, build_features, cost_sweep, evaluate_policy, load_data, metrics
 from scripts.rdm_common import ROOT, sha256
 from train import training_mask
 
@@ -54,12 +54,28 @@ class TemporalTests(unittest.TestCase):
         raw["maintenance_date"] = pd.to_datetime(raw["maintenance_date"])
         self.assertEqual(training_mask(raw, "2024-07-01", 30).tolist(), [True, False])
 
-    def test_cap_bounds_use_only_fit_data(self):
-        cap = QuantileCapper().fit(pd.DataFrame({"maintenance_cost": [10., 20., 30.]}))
-        original = dict(cap.upper_)
-        transformed = cap.transform(pd.DataFrame({"maintenance_cost": [19000.]}))
-        self.assertEqual(cap.upper_, original)
-        self.assertAlmostEqual(transformed.iloc[0, 0], 29.8)
+    def test_quartile_repairs_use_training_bounds_and_preserve_inliers(self):
+        repair = QuartileRepairer().fit(pd.DataFrame({"maintenance_cost": [10., 20., 30., 40., 50.]}))
+        original = repair.policy().copy()
+        transformed = repair.transform(pd.DataFrame({"maintenance_cost": [9000., 100., -100., 60., np.nan],
+                                                     "downtime_hours": [999., 2., 3., 4., np.nan]}))
+        self.assertEqual(repair.policy(), original)
+        self.assertEqual(transformed.maintenance_cost.iloc[:4].tolist(), [40., 40., 20., 60.])
+        self.assertTrue(pd.isna(transformed.maintenance_cost.iloc[4]))
+        self.assertTrue(pd.isna(transformed.downtime_hours.iloc[0]))
+
+    def test_na_features_and_blank_categories_do_not_become_valid_hours(self):
+        features = build_features(pd.DataFrame([example(downtime_hours=999.)]))
+        self.assertTrue(pd.isna(features.iloc[0].downtime_hours))
+        self.assertEqual(features.iloc[0].fault_category, "N/A")
+
+    def test_policy_reports_precision_recall_tpr_fpr(self):
+        actual = evaluate_policy([1, 0, 1, 0], [.9, .8, .7, .1],
+                                 {"policy": "threshold", "threshold": .75, "miss_cost": 300, "inspection_cost": 60})
+        for key in ("precision", "recall", "tpr", "fpr"):
+            self.assertEqual(actual[key], .5)
+        for key in ("true_positives", "false_positives", "false_negatives", "true_negatives"):
+            self.assertEqual(actual[key], 1)
 
     def test_cost_search_includes_no_flags_and_exact_boundary(self):
         best, table = cost_sweep([0, 0], [.5, 1.])

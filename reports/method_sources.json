@@ -47,7 +47,7 @@
       "url": "https://numpy.org/doc/stable/reference/generated/numpy.quantile.html"
     },
     "S09": {
-      "title": "pandas Series.quantile：운영 상한 계산 API",
+      "title": "pandas Series.quantile：선형 사분위수 API",
       "url": "https://pandas.pydata.org/docs/reference/api/pandas.Series.quantile.html"
     },
     "S10": {
@@ -85,7 +85,15 @@
     "S18": {
       "title": "OneHotEncoder：범주 지시열·미관측 범주 처리",
       "url": "https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.OneHotEncoder.html"
+    },
+    "S19": {
+      "title": "NIST：사분위수·IQR 울타리와 이상치 해석",
+      "url": "https://www.itl.nist.gov/div898/handbook/prc/section1/prc16.htm"
+    },
+    "S20": {
+      "title": "confusion_matrix：TP·FP·FN·TN 정의",
+      "url": "https://scikit-learn.org/stable/modules/generated/sklearn.metrics.confusion_matrix.html"
     }
   },
-  "scope": "Official algorithm/API definitions. Costs, q99, history windows and model configuration are educational assumptions or project choices, not military standards."
+  "scope": "Official algorithm/API definitions and IQR fences. Costs, 999 missingness, hundredfold errors, quartile replacement, history windows and fixed model settings are task/user assumptions or project choices, not military standards."
 }

@@ -1,194 +1,46 @@
 {
-  "checked_at_utc": "2026-11-17T05:01:25.651687+00:00",
-  "streamlit": "1.67.0",
-  "server": "127.0.0.1:8766 (temporary agent API instance)",
-  "passed": true,
-  "cases": [
+  "checked_at_utc": "2026-11-17T07:01:11.356610+00:00",
+  "analysis_sha256": "b06291cd91a1155b77355302a8e7a75bf955bbfa0eb6bdde9857a4e316d8b533",
+  "status": "passed",
+  "entrypoints": [
     {
-      "case": "default",
-      "status": "ready",
-      "metrics": {
-        "재점검 선정": "20대",
-        "전체 후보": "81대",
-        "위험 기준 이상": "22대",
-        "위험 초과 대기": "2대",
-        "30일 이내 재고장 예측 확률": "95.82%"
-      },
-      "dataframe_rows": [
-        4,
-        20,
-        3,
-        151
+      "entrypoint": "app.py",
+      "port": 8766,
+      "status": "passed",
+      "checks": [
+        "default_counts",
+        "korean_model_comparison",
+        "thresholds_and_english_rates",
+        "korean_features",
+        "training_quartiles_and_cleaning_download",
+        "capacity_independence",
+        "manual_threshold_independence",
+        "restoration"
       ],
-      "exceptions": []
+      "console_warnings": false
     },
     {
-      "case": "capacity_5",
-      "status": "ready",
-      "metrics": {
-        "재점검 선정": "5대",
-        "전체 후보": "81대",
-        "위험 기준 이상": "22대",
-        "위험 초과 대기": "17대",
-        "30일 이내 재고장 예측 확률": "95.82%"
-      },
-      "dataframe_rows": [
-        4,
-        5,
-        3,
-        151
+      "entrypoint": "app_styled.py",
+      "port": 8767,
+      "status": "passed",
+      "checks": [
+        "default_counts",
+        "korean_model_comparison",
+        "thresholds_and_english_rates",
+        "korean_features",
+        "training_quartiles_and_cleaning_download",
+        "capacity_independence",
+        "manual_threshold_independence",
+        "restoration"
       ],
-      "exceptions": []
-    },
-    {
-      "case": "manual_threshold",
-      "status": "ready",
-      "metrics": {
-        "재점검 선정": "20대",
-        "전체 후보": "81대",
-        "위험 기준 이상": "22대",
-        "위험 초과 대기": "2대",
-        "30일 이내 재고장 예측 확률": "95.82%"
-      },
-      "dataframe_rows": [
-        4,
-        20,
-        3,
-        151
-      ],
-      "exceptions": []
-    },
-    {
-      "case": "threshold_100_percent",
-      "status": "ready",
-      "metrics": {
-        "재점검 선정": "20대",
-        "전체 후보": "81대",
-        "위험 기준 이상": "0대",
-        "위험 초과 대기": "0대",
-        "30일 이내 재고장 예측 확률": "95.82%"
-      },
-      "dataframe_rows": [
-        4,
-        20,
-        3,
-        151
-      ],
-      "exceptions": []
-    },
-    {
-      "case": "model_validation",
-      "status": "ready",
-      "metrics": {
-        "재점검 선정": "20대",
-        "전체 후보": "81대",
-        "위험 기준 이상": "22대",
-        "위험 초과 대기": "2대",
-        "하반기 AP": "0.7877",
-        "하반기 ROC-AUC": "0.8814",
-        "월 20대 적중 합계": "38건",
-        "무작위 기준선 평균": "13.8건"
-      },
-      "dataframe_rows": [
-        8,
-        6,
-        2
-      ],
-      "exceptions": []
-    },
-    {
-      "case": "data_process",
-      "status": "ready",
-      "metrics": {
-        "재점검 선정": "20대",
-        "전체 후보": "81대",
-        "위험 기준 이상": "22대",
-        "위험 초과 대기": "2대"
-      },
-      "dataframe_rows": [
-        3,
-        6,
-        4
-      ],
-      "exceptions": []
-    },
-    {
-      "case": "empty_filter",
-      "status": "ready",
-      "metrics": {
-        "재점검 선정": "20대",
-        "전체 후보": "81대",
-        "위험 기준 이상": "22대",
-        "위험 초과 대기": "2대"
-      },
-      "dataframe_rows": [
-        0,
-        0
-      ],
-      "exceptions": []
-    },
-    {
-      "case": "restored",
-      "status": "ready",
-      "metrics": {
-        "재점검 선정": "20대",
-        "전체 후보": "81대",
-        "위험 기준 이상": "22대",
-        "위험 초과 대기": "2대",
-        "30일 이내 재고장 예측 확률": "95.82%"
-      },
-      "dataframe_rows": [
-        4,
-        20,
-        3,
-        151
-      ],
-      "exceptions": []
-    },
-    {
-      "case": "sort_equipment_ascending",
-      "status": "ready",
-      "metrics": {
-        "재점검 선정": "20대",
-        "전체 후보": "81대",
-        "위험 기준 이상": "22대",
-        "위험 초과 대기": "2대",
-        "30일 이내 재고장 예측 확률": "95.82%"
-      },
-      "dataframe_rows": [
-        4,
-        20,
-        3,
-        151
-      ],
-      "exceptions": []
+      "console_warnings": false
     }
   ],
-  "limits": "Headless runtime checks do not render. ButtonColumn clicks and visual layout are checked in browser separately.",
-  "browser_check": {
-    "verified_at_utc": "2026-11-17T05:12:35.944639+00:00",
-    "method": "Windows accessibility and screenshot inspection after user opened Edge",
-    "url": "http://127.0.0.1:8503",
-    "default_metrics": {
-      "selected": 20,
-      "candidates": 81,
-      "risk_flagged": 22,
-      "outside_capacity": 2
-    },
-    "type_drilldown": "???? ??20? -> ?? ??",
-    "maintenance_drilldown": "???? ??18? -> ??20? ??",
-    "views_verified": [
-      "??? ??",
-      "?? ??",
-      "??????"
-    ],
-    "display_fix_verified": "?? ?? ??? ???? ?? ???? ?? ? ???",
-    "agent_api_on_user_server": "disabled",
-    "temporary_server_8766": "stopped"
+  "checks_passed": 16,
+  "user_preview": {
+    "url": "http://127.0.0.1:8517",
+    "health": "ok",
+    "agent_api": "disabled"
   },
-  "app_sha256": {
-    "app.py": "170a9fc93439f185dab515706cf3a271e81a547909cef643478243a15da6c4f6",
-    "app_helpers.py": "df3c2036130c04836764c7b1410ff1c021c07b2d23c55674771de4e6f00c6125",
-    ".streamlit/config.toml": "ffd2d41ff7caf8dfdf694b77e36284709839476bc72163c9820b01410154c2de"
-  }
+  "visual_qa": "Unverified: browser host unavailable; both native Edge activation attempts failed to activate captured window."
 }

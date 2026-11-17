@@ -1,8 +1,14 @@
 {
-  "reports/2026-01_분석결과보고.md": "d42c61e2b509a7fed2195634a94d036a1082bdc5190063be14793794a9ccfab1",
-  "reports/2026-01_지휘관발표스크립트.md": "4105686d60cb90791ccaf1739064c0c292740f192b77780f33e573fed24a5701",
-  "reports/계산식_출처_대조표.md": "eb468a44bdb80a13465eb78f746ad9e61a5bc0de0456c916a83134a7eb19be66",
-  "reports/briefing_evidence.json": "24d7379647458143e265c2e34ba294abfdc962bde81eb745c4bb4c677a7a8733",
-  "reports/method_sources.json": "c4d6688d8efe5b7bbaec74b7e469819daf45a1be29b63d09c2c457c2c95a11bb",
-  "scripts/build_briefing.py": "98b56bcb9d681ac9a3bab999f94769f3fc867422574b1fed56f8d67587eb30f4"
+  "reports/2026-01_분석결과보고.md": "441cc4c654c9c02c283fbd10a69f27bf0c2576ae038e802ba36b76090a807182",
+  "reports/2026-01_지휘관발표스크립트.md": "92336fb96a75059173f106d97aef76ee6e1f0381fa37c181cc2c74dd9198b93d",
+  "reports/계산식_출처_대조표.md": "ad3a249c4f5a64c8ac720260b54c4c25758c00f91e9256b00536ea163c3baa18",
+  "reports/briefing_evidence.json": "3b969c2e4c3f4158467939f10e358617e2e306bc2327a64dc6677310c83df028",
+  "reports/method_sources.json": "d73bf74404bf31eba0a23ce82f78b06203f97b28602ab7b1d7d082c5f237b842",
+  "scripts/build_briefing.py": "baea28c5b020c29d975a9de92081d4f0d62f7e95d8132c3ebeed9cc47a55773b",
+  "scripts/briefing_content.py": "e2d335fe87486b10ebb15c7e8f96b5a21eafb87ffa5756651a37e9ff7ed6d3a8",
+  "app.py": "aed3f0f12eeba931ac944c20af5012d7cab71cdd81d2f8aec30a16ba76c0226e",
+  "app_styled.py": "007ca736385581968e2b6ed12826316a87fa64bdfa027ad61d84ed5a64fb0298",
+  "rdm_ui/__init__.py": "d3db6daa77153a80058a8cf2b5ebf5e33ffff400a5f9c7b15ebc9f34ee397e83",
+  "rdm_ui/dashboard.py": "bb3c88d992c8d71dd6aff0f37d8f139f755e8a232cf73b9b35fed87e1631d576",
+  "rdm_ui/readability.css": "40fbe3d11ed5bba6df6b1db4c60e2776a1c3260290cb0f2c5cca52fefcd4ea70"
 }

@@ -1,0 +1,161 @@
+/* Optional RDM layer: public st-key hooks and semantic HTML only.
+   Keep the existing theme, canvas tables, charts, and alert colors intact. */
+.st-key-rdm_readability {
+    --rdm-accent: #087f8c;
+    --rdm-accent-ink: #075965;
+    --rdm-accent-soft: #e6f2f3;
+    --rdm-ink: #14283f;
+    --rdm-body: #40546b;
+    --rdm-border: #d5e0e8;
+    font-variant-numeric: tabular-nums;
+}
+
+.st-key-rdm_readability :is(h1, h2, h3) {
+    color: var(--rdm-ink);
+    line-height: 1.4;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+    text-wrap: balance;
+    scroll-margin-top: 5rem;
+}
+
+.st-key-rdm_readability h1 {
+    font-size: clamp(1.75rem, 2.5vw, 2.25rem);
+    font-weight: 700;
+    letter-spacing: -0.035em;
+    padding-block: 0.125rem 0.65rem;
+    border-bottom: 1px solid var(--rdm-border);
+}
+
+.st-key-rdm_readability h2 {
+    font-size: 1.4rem;
+    padding-top: 0.75rem;
+}
+
+.st-key-rdm_readability h3 {
+    font-size: 1.2rem;
+    font-weight: 650;
+    padding-top: 0.65rem;
+}
+
+/* Essential caveats are captions in the original app. Make prose readable
+   without recoloring alerts, links, or selected controls. */
+.st-key-rdm_readability p:not(:where(button *, label *, a *, [role="alert"] *, [role="status"] *)) {
+    color: var(--rdm-body);
+    font-size: 0.9375rem;
+    line-height: 1.65;
+    overflow-wrap: anywhere;
+}
+
+.st-key-rdm_readability label {
+    font-weight: 600;
+}
+
+.st-key-rdm_readability .st-key-view {
+    background-color: #fff;
+    border: 1px solid var(--rdm-border);
+    border-radius: 0.6rem;
+    padding: 0.75rem;
+    margin-block: 0.25rem 0.15rem;
+}
+
+.st-key-rdm_readability .st-key-view button {
+    min-height: 2.625rem;
+    padding-inline: 1rem;
+    font-size: 0.9375rem;
+}
+
+.st-key-rdm_readability .st-key-view [role="radio"][aria-checked="true"] {
+    background-color: var(--rdm-accent);
+    border-color: var(--rdm-accent);
+    color: #fff;
+    font-weight: 600;
+}
+
+.st-key-rdm_readability :is(.st-key-summary_kind, .st-key-list_scope, .st-key-sort_direction) button {
+    min-height: 2.375rem;
+    padding-inline: 0.8rem;
+}
+
+.st-key-rdm_readability :is(.st-key-summary_kind, .st-key-list_scope, .st-key-sort_direction) [role="radio"][aria-checked="true"] {
+    background-color: var(--rdm-accent-soft);
+    border-color: var(--rdm-accent);
+    color: var(--rdm-accent-ink);
+    font-weight: 600;
+}
+
+.st-key-rdm_readability :is(.st-key-download_view, .st-key-download_plan,
+    .st-key-download_cleaning, .st-key-download_monthly, .st-key-download_test) button {
+    min-height: 2.625rem;
+    font-weight: 500;
+}
+
+.st-key-rdm_readability :is(button, input, [role="combobox"]):focus-visible {
+    outline: 2px solid var(--rdm-accent-ink);
+    outline-offset: 3px;
+}
+
+/* st.sidebar is outside the main container. The public root key gates every
+   sidebar rule, so importing the package alone never changes another app. */
+body:has(.st-key-rdm_readability) [aria-label="Sidebar"] {
+    font-variant-numeric: tabular-nums;
+}
+
+body:has(.st-key-rdm_readability) [aria-label="Sidebar"] :is(h2, h3) {
+    line-height: 1.4;
+    word-break: keep-all;
+}
+
+body:has(.st-key-rdm_readability) [aria-label="Sidebar"] h2 {
+    font-size: 1.35rem;
+}
+
+body:has(.st-key-rdm_readability) [aria-label="Sidebar"] h3 {
+    font-size: 1.05rem;
+}
+
+body:has(.st-key-rdm_readability) [aria-label="Sidebar"] p:not(:where(button *, label *, a *, [role="alert"] *, [role="status"] *)) {
+    color: #40546b;
+    font-size: 0.875rem;
+    line-height: 1.6;
+}
+
+body:has(.st-key-rdm_readability) [aria-label="Sidebar"] label {
+    font-weight: 600;
+}
+
+body:has(.st-key-rdm_readability) :is(.st-key-types, .st-key-maintenance) button {
+    min-height: 2.25rem;
+    padding-inline: 0.65rem;
+}
+
+body:has(.st-key-rdm_readability) :is(.st-key-types, .st-key-maintenance) [aria-pressed="true"] {
+    background-color: #e6f2f3;
+    border-color: #087f8c;
+    color: #075965;
+    font-weight: 600;
+}
+
+body:has(.st-key-rdm_readability) .st-key-capacity input {
+    font-size: 1.05rem;
+    font-weight: 600;
+}
+
+body:has(.st-key-rdm_readability) [aria-label="Sidebar"] :is(button, input, [role="combobox"]):focus-visible {
+    outline: 2px solid #075965;
+    outline-offset: 3px;
+}
+
+@media (max-width: 640px) {
+    .st-key-rdm_readability h1 {
+        font-size: 1.75rem;
+    }
+
+    .st-key-rdm_readability .st-key-view {
+        padding: 0.5rem;
+    }
+
+    .st-key-rdm_readability .st-key-view button {
+        padding-inline: 0.75rem;
+    }
+}

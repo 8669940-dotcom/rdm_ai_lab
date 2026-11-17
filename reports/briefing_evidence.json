@@ -1,20 +1,21 @@
 {
   "passed": true,
-  "checked_at_utc": "2026-11-17T05:57:54.918054+00:00",
+  "checked_at_utc": "2026-11-17T07:00:02.259998+00:00",
   "tolerance_absolute": 1e-12,
   "input_sha256": {
-    "README.txt": "215d19d4ed4e03228094ad7f787fd86d3ea0e6e6292b3f08f85d98271941185e",
+    "README.txt": "ef6e8e4f4a46d652d72523002aaf4a3276763ac2495a55551b1b699200d5fd75",
     "analysis_config.json": "e9f9bae4575a639e6ab8164d78a9537f0c7160b364b2b8cc420c060203b7937d",
-    "rdm_model.py": "b4f8dc47706360cc831c95d45d618b9842d136499fdb82b6905ca525eaf511b6",
-    "scripts/train.py": "2527e45a5364bc1ab74178c248b4984051d4fec635b782750a63be77c438099c",
-    "reports/analysis_results.json": "2df63a089f2b33eb03a646147d7b4e5952cac1f3e7e89570e89418056c279079",
-    "reports/validation_predictions_2024H2.csv": "3f2d10b7e46f4551e97527caba55a9b982eb589e1804a2a02bc26101f2f19730",
-    "reports/threshold_costs.csv": "f70d24d3068c3441b95d5b53a2f1ba19ec39f16306ec462ee666308b0578a16a",
+    "rdm_model.py": "2193819ab4bd9faf0ce9e38b73eaefffd51ddf2dd480be0688c0583f557f4ebd",
+    "scripts/train.py": "fe4f5ba6a88e377db5cfa95870120d433c74edc7f162f4dd48fd1d2dc8556d0a",
+    "reports/analysis_results.json": "b06291cd91a1155b77355302a8e7a75bf955bbfa0eb6bdde9857a4e316d8b533",
+    "reports/validation_predictions_2024H2.csv": "673f8b38d6b44797e03fa881595893c54e13b3d6ec185651930c8cf2740ba3ae",
+    "reports/threshold_costs.csv": "7959effc0f49a579f778b4eff2a12253cbb0d0edcba30bc95b9a3efd19238ae6",
     "reports/data_profile.json": "dec58136a97b0b5e9683fccdf0f3df3de221e83b4edfeeeeac98b670af36d939",
-    "reports/monthly_validation.csv": "22fbeb2de1dd4634a493a3a151a1bdf5972b021b51240cbe457025933f019591",
-    "reports/eda_summary.csv": "97fcacaf5f63f1b97a9b330edc4beb6fe6e8b265e3f198bf2490ad51bfaefaee",
-    "artifacts/rdm_model.joblib": "7eef71b5a5dc5dd8271968e92fa791b70b6d59b8c90d4f47ca63281a016e86ee",
-    "artifacts/submission_model.joblib": "71df53d53cadd5c834e2ac5467e7697740fa5fad8aa8160f9163a3019fd0ac5b",
+    "reports/monthly_validation.csv": "34734e9ecf1fc98ebe31b4f4dcaaf5970cd9720b8680307e26854b624f5709bc",
+    "reports/eda_summary.csv": "875997238bb5f86f010e7833fd020466ab5fea4dba1caad6adc54fc83c478034",
+    "reports/cleaning_audit.csv": "c4788adaf04b5d535f346d4932942899ebb28ab907f1602e490190b2edca8189",
+    "artifacts/rdm_model.joblib": "d4fc9e921f6be9a572544267359f4506e172e316b135e3efabc3e9e4cc5733bd",
+    "artifacts/submission_model.joblib": "ba2ebd5eb834c526d36ef83ea6d68b914281c0ee15bb59d0902dab587aec20df",
     "data/drone_train.csv": "26c4d3711fd5c91dc183815af83ba5af6107b6470ae2d3660da2a50586136121",
     "data/drone_test.csv": "5fa789dd8111ce5c3303e9a5c9f0694aec409a1c3a504574cc2ab2386ece7a7e",
     "data/drone_this_month.csv": "379631f03af5139d8a0c5c7278d812b7892da022a4d7650488eafe5ff564e346"
@@ -23,39 +24,39 @@
     "rows": 643,
     "positives": 176,
     "prevalence": 0.2737169517884914,
-    "ap": 0.7876711727063498,
-    "pr_auc_trapezoid": 0.7869522741756255,
-    "roc_auc": 0.8813874829667121,
-    "brier": 0.11184045004412485
+    "ap": 0.7914950472477289,
+    "pr_auc_trapezoid": 0.7908512153535323,
+    "roc_auc": 0.8820566478489391,
+    "brier": 0.11176279722443704
   },
   "development_reconstruction": {
     "rows": 511,
     "positives": 114,
     "prevalence": 0.22309197651663404,
-    "ap": 0.7157616351332275,
-    "pr_auc_trapezoid": 0.7148118054013132,
-    "roc_auc": 0.8224844226435105,
-    "brier": 0.11373147763659185
+    "ap": 0.7151608501396177,
+    "pr_auc_trapezoid": 0.7141941961924131,
+    "roc_auc": 0.8237880595695789,
+    "brier": 0.11338260181702516
   },
   "reconstructed_policies": {
     "300": {
-      "threshold": 0.40140788483944695,
+      "threshold": 0.29849894728826626,
       "policy": "threshold",
-      "flagged": 111,
-      "true_positives": 74,
-      "false_negatives": 40,
-      "cost": 18660,
+      "flagged": 165,
+      "true_positives": 86,
+      "false_negatives": 28,
+      "cost": 18300,
       "miss_cost": 300,
       "inspection_cost": 60,
       "unit": "maintenance_record"
     },
     "600": {
-      "threshold": 0.22762209934496863,
+      "threshold": 0.13740580596729415,
       "policy": "threshold",
-      "flagged": 182,
-      "true_positives": 87,
-      "false_negatives": 27,
-      "cost": 27120,
+      "flagged": 261,
+      "true_positives": 96,
+      "false_negatives": 18,
+      "cost": 26460,
       "miss_cost": 600,
       "inspection_cost": 60,
       "unit": "maintenance_record"
@@ -101,7 +102,7 @@
       "candidates": 103,
       "selected": 20,
       "positives": 19,
-      "model_hits": 11,
+      "model_hits": 12,
       "age_hits": 6,
       "random_expected_hits": 3.6893203883495147,
       "random_hits_mean": 3.691
@@ -145,7 +146,7 @@
       "candidates": 117,
       "selected": 20,
       "positives": 28,
-      "model_hits": 16,
+      "model_hits": 15,
       "age_hits": 9,
       "random_expected_hits": 4.786324786324786,
       "random_hits_mean": 4.798
@@ -201,58 +202,59 @@
   "calibration_bins_recomputed": [
     {
       "rows": 129,
-      "mean_predicted": 0.07261563194574766,
-      "observed_rate": 0.031007751937984496
+      "mean_predicted": 0.07201547030808227,
+      "observed_rate": 0.03875968992248062
     },
     {
       "rows": 128,
-      "mean_predicted": 0.091113035104127,
-      "observed_rate": 0.046875
+      "mean_predicted": 0.09177029966255318,
+      "observed_rate": 0.0390625
     },
     {
       "rows": 129,
-      "mean_predicted": 0.13394376451781348,
+      "mean_predicted": 0.13518058818786677,
       "observed_rate": 0.13178294573643412
     },
     {
       "rows": 128,
-      "mean_predicted": 0.3742555598150189,
-      "observed_rate": 0.375
+      "mean_predicted": 0.37117330075943034,
+      "observed_rate": 0.3671875
     },
     {
       "rows": 129,
-      "mean_predicted": 0.7571609995667051,
-      "observed_rate": 0.7829457364341085
+      "mean_predicted": 0.7519895226833583,
+      "observed_rate": 0.7906976744186046
     }
   ],
+  "cleaning_rows_recomputed": 2695,
   "example_drone": "DR-0115",
   "example_factor_recomputed": [
-    {
-      "feature": "prior_maintenance_90d",
-      "label": "이전 90일 정비 수",
-      "value": 12,
-      "reference": 1.0,
-      "delta_probability": 0.167111906090868,
-      "original_probability": 0.9582364486647842,
-      "replaced_probability": 0.7911245425739162
-    },
     {
       "feature": "days_since_prior_fault",
       "label": "이전 관측 고장 경과일",
       "value": 1.0,
       "reference": 65.0,
-      "delta_probability": 0.12769677398959156,
-      "original_probability": 0.9582364486647842,
-      "replaced_probability": 0.8305396746751926
+      "delta_probability": 0.15579284931342674,
+      "original_probability": 0.9567874024495615,
+      "replaced_probability": 0.8009945531361348
     },
     {
       "feature": "prior_faults_90d",
       "label": "이전 90일 사후·긴급정비 수",
       "value": 10,
       "reference": 0.0,
-      "delta_probability": 0.12317170596362459,
-      "original_probability": 0.9582364486647842,
-      "replaced_probability": 0.8350647427011596
+      "delta_probability": 0.12890126330322005,
+      "original_probability": 0.9567874024495615,
+      "replaced_probability": 0.8278861391463415
+    },
+    {
+      "feature": "prior_maintenance_90d",
+      "label": "이전 90일 정비 수",
+      "value": 12,
+      "reference": 1.0,
+      "delta_probability": 0.12513521018895823,
+      "original_probability": 0.9567874024495615,
+      "replaced_probability": 0.8316521922606033
     }
   ],
   "random_forest_parameters": {
@@ -266,5 +268,5 @@
     "random_state": 42
   },
   "data_and_models_unchanged": true,
-  "generator_sha256": "98b56bcb9d681ac9a3bab999f94769f3fc867422574b1fed56f8d67587eb30f4"
+  "generator_sha256": "baea28c5b020c29d975a9de92081d4f0d62f7e95d8132c3ebeed9cc47a55773b"
 }

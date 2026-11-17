@@ -1,4 +1,4 @@
-"""Run the README analysis with chronological selection, untouched evaluation and honest test export."""
+"""Run chronological model selection, fixed internal evaluation and honest test export."""
 from __future__ import annotations
 
 import json
@@ -21,7 +21,7 @@ from sklearn.metrics import precision_recall_curve, roc_curve
 from threadpoolctl import threadpool_limits
 
 from rdm_model import (CANDIDATES, FEATURE_LABELS, TARGET, build_features, cost_sweep,
-                       evaluate_policy, feature_columns, load_data, make_model, metrics, monthly_topk)
+                       TIME_SENTINELS, evaluate_policy, feature_columns, load_data, make_model, metrics, monthly_topk)
 from scripts.rdm_common import ROOT, load_config, rank_latest, sha256
 
 
@@ -77,6 +77,35 @@ def explain_reference(model, X, training_features, columns):
     return result, reference
 
 
+def cleaning_evidence(model, raw, features, mask, role, audit_rows):
+    numeric = model.named_steps["prep"].named_transformers_["numeric"]
+    repair = numeric.named_steps["repair"]
+    columns = list(repair.feature_names_in_)
+    part = raw.loc[mask]
+    original = features.loc[mask, columns]
+    cleaned = repair.transform(original)
+    medians = dict(zip(columns, numeric.named_steps["impute"].statistics_))
+    cost = part["maintenance_cost"]
+    outside = cost.lt(repair.lower_) | cost.gt(repair.upper_)
+    hundredfold = outside & cost.gt(repair.error_factor * repair.q3_)
+    for index in part.index:
+        for field in [*TIME_SENTINELS, "maintenance_cost", "days_since_last_maintenance"]:
+            value, replacement = part.loc[index, field], cleaned.loc[index, field]
+            missing = pd.isna(value) or (field in TIME_SENTINELS and value == 999)
+            changed = field == "maintenance_cost" and bool(outside.loc[index])
+            if missing or changed:
+                reason = "공란→N/A" if pd.isna(value) else "999시간→N/A" if missing else (
+                    "100배 입력 오류 가정÷100 후 Q1~Q3 제한" if hundredfold.loc[index] else "IQR 후보 Q1~Q3 제한")
+                audit_rows.append({"role": role, "source": part.loc[index, "_source"], "source_row": int(part.loc[index, "_source_row"]),
+                                   "equipment_id": part.loc[index, "equipment_id"], "maintenance_date": part.loc[index, "maintenance_date"],
+                                   "field": field, "label": FEATURE_LABELS[field], "original": value, "cleaned": replacement,
+                                   "model_imputed": medians[field] if pd.isna(replacement) else replacement, "reason": reason})
+    return {"rows": len(part), "time_999_to_na": {c: int(part[c].eq(999).sum()) for c in TIME_SENTINELS},
+            "numeric_blank": {c: int(part[c].isna().sum()) for c in columns if c in part and part[c].isna().any()},
+            "cost_outliers": int(outside.sum()), "cost_hundredfold_assumed": int(hundredfold.sum()),
+            "cost_quartile_only": int((outside & ~hundredfold).sum())}
+
+
 def main():
     started = time.perf_counter()
     config = load_config()
@@ -95,18 +124,19 @@ def main():
     evaluation = raw.loc[eval_mask]
     y_select = selection[TARGET].astype(int)
     y_eval = evaluation[TARGET].astype(int)
-    comparisons, selection_predictions = [], {}
+    comparisons, selection_predictions, selection_models = [], {}, {}
     for spec in CANDIDATES:
         tick = time.perf_counter()
         model, select_train_mask = fit_for_cutoff(raw, X, config["selection_start"], spec, config)
         p = model.predict_proba(X.loc[select_mask])[:, 1]
         result = metrics(y_select, p)
         monthly = monthly_topk(selection, p, config["capacity"], config["random_seed"])
-        item = {"key": spec["key"], "spec": spec, **result,
+        item = {"key": spec["key"], "label": spec["label"], "feature_group": spec["feature_group"], "spec": spec, **result,
                 "latest_top20_hits": sum(r["model_hits"] for r in monthly if r["unit"] == "latest_drone"),
                 "fit_predict_seconds": time.perf_counter() - tick}
         comparisons.append(item)
         selection_predictions[spec["key"]] = p
+        selection_models[spec["key"]] = model
         print(f"{spec['key']}: development AP={result['ap']:.4f}, top20 hits={item['latest_top20_hits']}", flush=True)
     # Only the earlier development window selects a model. Later evaluation is not used to reselect.
     chosen = sorted(comparisons, key=lambda r: (-r["ap"], -r["latest_top20_hits"], r["brier"], r["key"]))[0]
@@ -115,7 +145,7 @@ def main():
     policies, cost_tables = {}, []
     for miss_cost in config["miss_costs"]:
         best, table = cost_sweep(y_select, p_select, miss_cost, config["inspection_cost"])
-        policies[str(miss_cost)] = best
+        policies[str(miss_cost)] = {**best, **evaluate_policy(y_select, p_select, best)}
         cost_tables.extend({**r, "miss_cost": miss_cost} for r in table)
     eval_model, eval_train_mask = fit_for_cutoff(raw, X, config["validation_start"], spec, config)
     p_eval = eval_model.predict_proba(X.loc[eval_mask])[:, 1]
@@ -123,7 +153,7 @@ def main():
     eval_monthly = monthly_topk(evaluation, p_eval, config["capacity"], config["random_seed"])
     dev_monthly = monthly_topk(selection, p_select, config["capacity"], config["random_seed"])
     holdout_costs = {cost: evaluate_policy(y_eval, p_eval, policy) for cost, policy in policies.items()}
-    print(f"Selected {chosen['key']}; untouched evaluation AP={eval_metrics['ap']:.4f}", flush=True)
+    print(f"Selected {chosen['key']}; fixed later-window evaluation AP={eval_metrics['ap']:.4f}", flush=True)
 
     # Fixed model at the beginning of test year; never train on immature Dec 2024 labels.
     test_model, test_train_mask = fit_for_cutoff(raw, X, "2025-01-01", spec, config)
@@ -173,10 +203,17 @@ def main():
     fraction_positive, mean_predicted = calibration_curve(y_eval, p_eval, n_bins=5, strategy="quantile")
     joblib.dump({"model": month_model, "spec": spec, "reference": reference}, artifacts / "rdm_model.joblib", compress=3)
     joblib.dump({"model": test_model, "spec": spec}, artifacts / "submission_model.joblib", compress=3)
-    capper = month_model.named_steps["prep"].named_transformers_["numeric"].named_steps["cap"]
-    bounds = capper.upper_ if spec["cap"] else {}
-    changed_counts = {source: {c: int((raw.loc[raw["_source"].eq(source), c] > upper).sum()) for c, upper in bounds.items()}
-                      for source in ("train", "test", "month")}
+    development_model = selection_models[chosen["key"]]
+    audit_rows, applications, fitted = [], {}, {}
+    for role, fitted_model, fit_mask, predict_mask in [
+        ("development", development_model, select_train_mask, select_mask),
+        ("evaluation", eval_model, eval_train_mask, eval_mask),
+        ("submission", test_model, test_train_mask, test_mask),
+        ("operation", month_model, month_train_mask, month_mask)]:
+        fitted[role] = fitted_model.named_steps["prep"].named_transformers_["numeric"].named_steps["repair"].policy()
+        applications[role + "_train"] = cleaning_evidence(fitted_model, raw, X, fit_mask, role + "_train", audit_rows)
+        applications[role + "_predict"] = cleaning_evidence(fitted_model, raw, X, predict_mask, role + "_predict", audit_rows)
+    pd.DataFrame(audit_rows).to_csv(reports / "cleaning_audit.csv", index=False, encoding="utf-8-sig", na_rep="N/A", float_format="%.17g")
     splits = {}
     for name, mask, cutoff in [("development_train", select_train_mask, config["selection_start"]),
                                ("evaluation_train", eval_train_mask, config["validation_start"]),
@@ -193,7 +230,7 @@ def main():
         "environment": {"python": platform.python_version(), "pandas": pd.__version__, "numpy": np.__version__,
                         "scikit_learn": sklearn.__version__, "streamlit": streamlit.__version__},
         "selection_rule": "Development AP descending, then latest-drone top20 hits descending, Brier ascending, key ascending. No selection on 2024H2.",
-        "selected_model": chosen["key"], "selected_spec": spec, "comparisons": comparisons,
+        "selected_model": chosen["key"], "selected_model_label": spec["label"], "selected_spec": spec, "comparisons": comparisons,
         "splits": splits,
         "development": {"start": config["selection_start"], "end": config["selection_end"],
                         "metrics": metrics(y_select, p_select), "monthly": dev_monthly},
@@ -203,16 +240,16 @@ def main():
                        "roc_curve": [{"fpr": float(f), "tpr": float(t)} for f, t in zip(fpr, tpr)],
                        "calibration": [{"mean_predicted": float(p), "observed_rate": float(y)} for p, y in zip(mean_predicted, fraction_positive)]},
         "threshold_policies": policies, "threshold_tie_rule": "Minimum cost; then fewer flags; then higher threshold. Include no-flags policy.",
-        "processing": {"removed_rows": 0, "cap_enabled": spec["cap"], "operation_train_q99_caps": bounds,
-                       "operation_cap_counts_by_source": changed_counts,
+        "processing": {"removed_rows": 0, "policy_version": "na999_cost100_iqr_quartile_v2",
+                       "fitted_by_role": fitted, "applications": applications, "audit_file": "reports/cleaning_audit.csv",
                        "numeric_imputation": "Median and missing indicators fitted only on each training period",
-                       "categorical_imputation": "Preventive fault blanks: 해당 없음; other fault blanks: 미기재",
+                       "categorical_imputation": "All blank categories are N/A; blank fault fields occur in preventive records",
                        "excluded": {"equipment_id": "Identifier for history and submission; excluded from input",
                                     "maintenance_date": "Ordering and calendar features only",
                                     "availability_rate": "Monthly end value unavailable after maintenance; absent in January input",
                                     TARGET: "Outcome, never a predictor",
                                     **({"unit_code": "Context-feature alternative lost on development AP", "fault_code": "Context-feature alternative lost on development AP"} if not spec["context"] else {})},
-                       "feature_columns": columns},
+                       "feature_columns": columns, "feature_labels": [FEATURE_LABELS[c] for c in columns]},
         "permutation_importance": importances,
         "explanation_method": "One feature replaced by operation-training median/mode; original probability minus replaced probability. Not SHAP, additive attribution or causal effect; correlated/redundant features can mask or duplicate effects.",
         "current": {"month": config["report_month"], "as_of": "2026-01-31", "records": len(monthly_raw),
@@ -223,6 +260,8 @@ def main():
         "test": {"rows": len(test_export), "labels_available": False, "metrics": None,
                  "prediction_file": "reports/test_predictions_2025.csv", "model_training": "submission_train"},
         "limitations": ["Educational synthetic data; performance is not evidence of operational safety or actual savings.",
+                        "The later 2024 window was already inspected in earlier iterations; it is not fresh external validation of the revised workflow.",
+                        "999-as-missing and hundredfold cost errors are user-directed assumptions, not verified data-generation rules. IQR repairs can suppress real high-cost events.",
                         "Instructor test labels and grading unit are unavailable; no 2025 performance is reported.",
                         "Refitting changes probability scale; the frozen development threshold may drift and needs prospective calibration.",
                         "Monthly latest-record snapshots are retrospective month-end plans, not live daily dispatch decisions.",
@@ -231,7 +270,7 @@ def main():
         "seconds": time.perf_counter() - started,
     }
     save_json(reports / "analysis_results.json", evidence)
-    save_json(artifacts / "model_card.json", {k: evidence[k] for k in ("created_at_utc", "selected_model", "selected_spec", "environment", "splits", "threshold_policies", "processing", "data_sha256", "code_sha256", "limitations")})
+    save_json(artifacts / "model_card.json", {k: evidence[k] for k in ("created_at_utc", "selected_model", "selected_model_label", "selected_spec", "environment", "splits", "threshold_policies", "processing", "data_sha256", "code_sha256", "limitations")})
     print(f"Saved test={len(test_export)} rows, candidates={len(current)}, selected={evidence['current']['selected']}, "
           f"risk={evidence['current']['risk_flagged']}; {evidence['seconds']:.1f}s", flush=True)
 

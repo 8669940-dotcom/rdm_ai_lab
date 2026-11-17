@@ -11,8 +11,10 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class DashboardTests(unittest.TestCase):
+    entrypoint = "app.py"
+
     def app(self):
-        app = AppTest.from_file(str(ROOT / "app.py"), default_timeout=30).run()
+        app = AppTest.from_file(str(ROOT / self.entrypoint), default_timeout=30).run()
         self.assertFalse(app.exception)
         return app
 
@@ -49,6 +51,15 @@ class DashboardTests(unittest.TestCase):
             app.segmented_control(key="view").set_value(page).run()
             self.assertFalse(app.exception)
 
+    def test_reanalysis_comparison_is_korean_and_has_twelve_configurations(self):
+        app = self.app()
+        app.segmented_control(key="view").set_value("모델 검증").run()
+        tables = [x.value for x in app.dataframe if "모델·피처 구성" in x.value.columns]
+        self.assertEqual(len(tables), 1)
+        self.assertEqual(len(tables[0]), 12)
+        self.assertTrue(tables[0]["모델·피처 구성"].str.contains("현재 정비·상태").all())
+        self.assertFalse(tables[0]["모델·피처 구성"].str.contains("_quartile").any())
+
     def test_group_back_restores_scope_and_sort(self):
         app = self.app()
         app.selectbox(key="sort_field").set_value("드론").run()
@@ -61,6 +72,11 @@ class DashboardTests(unittest.TestCase):
         self.assertIsNone(app.session_state["group_filter"])
         self.assertEqual(app.selectbox(key="sort_field").value, "드론")
         self.assertEqual(app.segmented_control(key="list_scope").value, "선정 대상")
+
+
+class StyledDashboardTests(DashboardTests):
+    """The styled entry point must preserve the same six observable contracts."""
+    entrypoint = "app_styled.py"
 
 
 if __name__ == "__main__":

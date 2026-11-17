@@ -37,16 +37,15 @@ FEATURE_LABELS = {
     "equipment_type": "드론 유형", "maintenance_type": "정비 구분", "fault_category": "고장 유형",
     "unit_code": "부대", "fault_code": "고장 코드",
 }
-CANDIDATES = [
-    {"key": "lr_basic_cap", "kind": "logistic", "history": False, "context": False, "cap": True},
-    {"key": "lr_history_raw", "kind": "logistic", "history": True, "context": False, "cap": False},
-    {"key": "lr_history_cap", "kind": "logistic", "history": True, "context": False, "cap": True},
-    {"key": "lr_context_cap", "kind": "logistic", "history": True, "context": True, "cap": True},
-    {"key": "rf_history_cap", "kind": "random_forest", "history": True, "context": False, "cap": True},
-    {"key": "histgb_history_cap", "kind": "hist_gradient_boosting", "history": True, "context": False, "cap": True},
-    {"key": "lgbm_history_cap", "kind": "lightgbm", "history": True, "context": False, "cap": True},
-    {"key": "lgbm_context_cap", "kind": "lightgbm", "history": True, "context": True, "cap": True},
-]
+MODEL_LABELS = {"logistic": "로지스틱 회귀", "random_forest": "랜덤 포레스트",
+                "hist_gradient_boosting": "히스토그램 경사 부스팅", "lightgbm": "라이트지비엠"}
+FEATURE_GROUPS = {"basic": "현재 정비·상태", "history": "현재 정비·상태 + 과거 정비 이력",
+                  "context": "현재 정비·상태 + 과거 정비 이력 + 부대·고장 코드"}
+CANDIDATES = [{"key": f"{kind}_{group}_quartile", "kind": kind,
+               "history": group != "basic", "context": group == "context",
+               "label": MODEL_LABELS[kind] + " / " + FEATURE_GROUPS[group], "feature_group": FEATURE_GROUPS[group]}
+              for kind in MODEL_LABELS for group in FEATURE_GROUPS]
+TIME_SENTINELS = ("downtime_hours", "repair_duration_hours")
 
 
 def load_data() -> pd.DataFrame:
@@ -69,9 +68,10 @@ def build_features(raw: pd.DataFrame) -> pd.DataFrame:
     frame = raw.copy()
     frame["maintenance_date"] = pd.to_datetime(frame["maintenance_date"])
     output = frame[BASE_NUMERIC[:9] + BASE_CATEGORICAL + ["unit_code", "fault_code"]].copy()
-    for column in ("fault_code", "fault_category"):
-        absent = np.where(frame["maintenance_type"].eq("예방정비"), "해당 없음", "미기재")
-        output[column] = frame[column].where(frame[column].notna(), pd.Series(absent, index=frame.index))
+    for column in BASE_CATEGORICAL + ["unit_code", "fault_code"]:
+        output[column] = frame[column].fillna("N/A")
+    for column in TIME_SENTINELS:
+        output[column] = output[column].replace(999., np.nan)
     output["gap_missing"] = frame["days_since_last_maintenance"].isna().astype(int)
     month = frame["maintenance_date"].dt.month
     output["month_sin"] = np.sin(2 * np.pi * month / 12)
@@ -100,22 +100,44 @@ def build_features(raw: pd.DataFrame) -> pd.DataFrame:
     return output.join(pd.DataFrame.from_dict(histories, orient="index"))
 
 
-class QuantileCapper(TransformerMixin, BaseEstimator):
-    """Learn 99th percentile bounds for time/cost from fit data only; no row removal."""
-    def __init__(self, enabled=True):
-        self.enabled = enabled
+class QuartileRepairer(TransformerMixin, BaseEstimator):
+    """User-directed error assumptions, fitted only on the training partition.
+
+    Time 999 is missing. Only cost IQR outliers are repaired: values exceeding
+    100*Q3 are assumed hundredfold errors, then all outlier replacements are
+    clipped into [Q1,Q3]. Inliers remain unchanged; original files are untouched.
+    """
+    def __init__(self, iqr_multiplier=1.5, error_factor=100.):
+        self.iqr_multiplier = iqr_multiplier
+        self.error_factor = error_factor
 
     def fit(self, X, y=None):
         self.feature_names_in_ = np.asarray(X.columns, dtype=object)
-        self.upper_ = {c: float(X[c].quantile(.99)) for c in ("downtime_hours", "maintenance_cost") if c in X}
+        cost = X["maintenance_cost"]
+        self.q1_, self.q3_ = float(cost.quantile(.25)), float(cost.quantile(.75))
+        if not np.isfinite([self.q1_, self.q3_]).all():
+            raise ValueError("Cost quartiles require observed training values")
+        iqr = self.q3_ - self.q1_
+        self.lower_ = self.q1_ - self.iqr_multiplier * iqr
+        self.upper_ = self.q3_ + self.iqr_multiplier * iqr
         return self
 
     def transform(self, X):
         result = X.copy()
-        if self.enabled:
-            for column, upper in self.upper_.items():
-                result[column] = result[column].clip(upper=upper)
+        for column in TIME_SENTINELS:
+            if column in result:
+                result[column] = result[column].replace(999., np.nan)
+        cost = result["maintenance_cost"]
+        outlier = cost.lt(self.lower_) | cost.gt(self.upper_)
+        hundredfold = outlier & cost.gt(self.error_factor * self.q3_)
+        corrected = cost.where(~hundredfold, cost / self.error_factor)
+        result["maintenance_cost"] = cost.where(~outlier, corrected.clip(self.q1_, self.q3_))
         return result
+
+    def policy(self):
+        return {"q1": self.q1_, "q3": self.q3_, "lower_fence": self.lower_, "upper_fence": self.upper_,
+                "iqr_multiplier": self.iqr_multiplier, "error_factor": self.error_factor,
+                "hundredfold_above": self.error_factor * self.q3_}
 
     def get_feature_names_out(self, input_features=None):
         return self.feature_names_in_ if input_features is None else np.asarray(input_features, dtype=object)
@@ -129,10 +151,10 @@ def feature_columns(spec: dict) -> tuple[list[str], list[str]]:
 def make_model(spec: dict, seed: int = 42) -> Pipeline:
     numeric, categorical = feature_columns(spec)
     prep = ColumnTransformer([
-        ("numeric", Pipeline([("cap", QuantileCapper(spec["cap"])),
+        ("numeric", Pipeline([("repair", QuartileRepairer()),
                               ("impute", SimpleImputer(strategy="median", add_indicator=True)),
                               ("scale", StandardScaler())]), numeric),
-        ("category", Pipeline([("impute", SimpleImputer(strategy="constant", fill_value="미기재")),
+        ("category", Pipeline([("impute", SimpleImputer(strategy="constant", fill_value="N/A")),
                                ("encode", OneHotEncoder(handle_unknown="ignore", sparse_output=False))]), categorical),
     ], remainder="drop").set_output(transform="pandas")
     estimators = {
@@ -209,7 +231,11 @@ def evaluate_policy(y, probabilities, policy: dict) -> dict:
     y, p = np.asarray(y, dtype=int), np.asarray(probabilities, dtype=float)
     flags = p >= policy["threshold"] if policy["policy"] == "threshold" else np.zeros(len(p), dtype=bool)
     fn, tp = int(y[~flags].sum()), int(y[flags].sum())
+    fp, tn = int(((y == 0) & flags).sum()), int(((y == 0) & ~flags).sum())
     return {"flagged": int(flags.sum()), "true_positives": tp, "false_negatives": fn,
             "cost": fn * policy["miss_cost"] + int(flags.sum()) * policy["inspection_cost"],
+            "false_positives": fp, "true_negatives": tn,
             "precision": tp / int(flags.sum()) if flags.sum() else None,
-            "recall": tp / int(y.sum()) if y.sum() else None}
+            "recall": tp / int(y.sum()) if y.sum() else None,
+            "tpr": tp / int(y.sum()) if y.sum() else None,
+            "fpr": fp / int((y == 0).sum()) if (y == 0).sum() else None}

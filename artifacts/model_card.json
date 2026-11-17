@@ -1,12 +1,14 @@
 {
-  "created_at_utc": "2026-11-17T05:15:10.077415+00:00",
-  "selected_model": "rf_history_cap",
+  "created_at_utc": "2026-11-17T06:47:25.457852+00:00",
+  "selected_model": "random_forest_history_quartile",
+  "selected_model_label": "랜덤 포레스트 / 현재 정비·상태 + 과거 정비 이력",
   "selected_spec": {
-    "key": "rf_history_cap",
+    "key": "random_forest_history_quartile",
     "kind": "random_forest",
     "history": true,
     "context": false,
-    "cap": true
+    "label": "랜덤 포레스트 / 현재 정비·상태 + 과거 정비 이력",
+    "feature_group": "현재 정비·상태 + 과거 정비 이력"
   },
   "environment": {
     "python": "3.12.10",
@@ -47,51 +49,182 @@
   },
   "threshold_policies": {
     "300": {
-      "threshold": 0.40140788483944695,
+      "threshold": 0.29849894728826626,
       "policy": "threshold",
-      "flagged": 111,
-      "true_positives": 74,
-      "false_negatives": 40,
-      "cost": 18660,
+      "flagged": 165,
+      "true_positives": 86,
+      "false_negatives": 28,
+      "cost": 18300,
       "miss_cost": 300,
       "inspection_cost": 60,
-      "unit": "maintenance_record"
+      "unit": "maintenance_record",
+      "false_positives": 79,
+      "true_negatives": 318,
+      "precision": 0.5212121212121212,
+      "recall": 0.7543859649122807,
+      "tpr": 0.7543859649122807,
+      "fpr": 0.19899244332493704
     },
     "600": {
-      "threshold": 0.22762209934496863,
+      "threshold": 0.13740580596729415,
       "policy": "threshold",
-      "flagged": 182,
-      "true_positives": 87,
-      "false_negatives": 27,
-      "cost": 27120,
+      "flagged": 261,
+      "true_positives": 96,
+      "false_negatives": 18,
+      "cost": 26460,
       "miss_cost": 600,
       "inspection_cost": 60,
-      "unit": "maintenance_record"
+      "unit": "maintenance_record",
+      "false_positives": 165,
+      "true_negatives": 232,
+      "precision": 0.367816091954023,
+      "recall": 0.8421052631578947,
+      "tpr": 0.8421052631578947,
+      "fpr": 0.4156171284634761
     }
   },
   "processing": {
     "removed_rows": 0,
-    "cap_enabled": true,
-    "operation_train_q99_caps": {
-      "downtime_hours": 40.27500000000009,
-      "maintenance_cost": 386.0
-    },
-    "operation_cap_counts_by_source": {
-      "train": {
-        "downtime_hours": 24,
-        "maintenance_cost": 23
+    "policy_version": "na999_cost100_iqr_quartile_v2",
+    "fitted_by_role": {
+      "development": {
+        "q1": 16.0,
+        "q3": 31.0,
+        "lower_fence": -6.5,
+        "upper_fence": 53.5,
+        "iqr_multiplier": 1.5,
+        "error_factor": 100.0,
+        "hundredfold_above": 3100.0
       },
-      "test": {
-        "downtime_hours": 21,
-        "maintenance_cost": 8
+      "evaluation": {
+        "q1": 16.0,
+        "q3": 34.0,
+        "lower_fence": -11.0,
+        "upper_fence": 61.0,
+        "iqr_multiplier": 1.5,
+        "error_factor": 100.0,
+        "hundredfold_above": 3400.0
       },
-      "month": {
-        "downtime_hours": 2,
-        "maintenance_cost": 1
+      "submission": {
+        "q1": 16.0,
+        "q3": 41.0,
+        "lower_fence": -21.5,
+        "upper_fence": 78.5,
+        "iqr_multiplier": 1.5,
+        "error_factor": 100.0,
+        "hundredfold_above": 4100.0
+      },
+      "operation": {
+        "q1": 16.0,
+        "q3": 49.0,
+        "lower_fence": -33.5,
+        "upper_fence": 98.5,
+        "iqr_multiplier": 1.5,
+        "error_factor": 100.0,
+        "hundredfold_above": 4900.0
       }
     },
+    "applications": {
+      "development_train": {
+        "rows": 980,
+        "time_999_to_na": {
+          "downtime_hours": 1,
+          "repair_duration_hours": 0
+        },
+        "numeric_blank": {
+          "days_since_last_maintenance": 150
+        },
+        "cost_outliers": 201,
+        "cost_hundredfold_assumed": 3,
+        "cost_quartile_only": 198
+      },
+      "development_predict": {
+        "rows": 511,
+        "time_999_to_na": {
+          "downtime_hours": 2,
+          "repair_duration_hours": 0
+        },
+        "numeric_blank": {},
+        "cost_outliers": 129,
+        "cost_hundredfold_assumed": 0,
+        "cost_quartile_only": 129
+      },
+      "evaluation_train": {
+        "rows": 1611,
+        "time_999_to_na": {
+          "downtime_hours": 3,
+          "repair_duration_hours": 0
+        },
+        "numeric_blank": {
+          "days_since_last_maintenance": 150
+        },
+        "cost_outliers": 354,
+        "cost_hundredfold_assumed": 4,
+        "cost_quartile_only": 350
+      },
+      "evaluation_predict": {
+        "rows": 643,
+        "time_999_to_na": {
+          "downtime_hours": 1,
+          "repair_duration_hours": 0
+        },
+        "numeric_blank": {},
+        "cost_outliers": 184,
+        "cost_hundredfold_assumed": 1,
+        "cost_quartile_only": 183
+      },
+      "submission_train": {
+        "rows": 2223,
+        "time_999_to_na": {
+          "downtime_hours": 4,
+          "repair_duration_hours": 0
+        },
+        "numeric_blank": {
+          "days_since_last_maintenance": 150
+        },
+        "cost_outliers": 457,
+        "cost_hundredfold_assumed": 5,
+        "cost_quartile_only": 452
+      },
+      "submission_predict": {
+        "rows": 1241,
+        "time_999_to_na": {
+          "downtime_hours": 0,
+          "repair_duration_hours": 0
+        },
+        "numeric_blank": {},
+        "cost_outliers": 291,
+        "cost_hundredfold_assumed": 0,
+        "cost_quartile_only": 291
+      },
+      "operation_train": {
+        "rows": 2346,
+        "time_999_to_na": {
+          "downtime_hours": 4,
+          "repair_duration_hours": 0
+        },
+        "numeric_blank": {
+          "days_since_last_maintenance": 150
+        },
+        "cost_outliers": 434,
+        "cost_hundredfold_assumed": 5,
+        "cost_quartile_only": 429
+      },
+      "operation_predict": {
+        "rows": 106,
+        "time_999_to_na": {
+          "downtime_hours": 0,
+          "repair_duration_hours": 0
+        },
+        "numeric_blank": {},
+        "cost_outliers": 30,
+        "cost_hundredfold_assumed": 0,
+        "cost_quartile_only": 30
+      }
+    },
+    "audit_file": "reports/cleaning_audit.csv",
     "numeric_imputation": "Median and missing indicators fitted only on each training period",
-    "categorical_imputation": "Preventive fault blanks: 해당 없음; other fault blanks: 미기재",
+    "categorical_imputation": "All blank categories are N/A; blank fault fields occur in preventive records",
     "excluded": {
       "equipment_id": "Identifier for history and submission; excluded from input",
       "maintenance_date": "Ordering and calendar features only",
@@ -124,6 +257,31 @@
       "equipment_type",
       "maintenance_type",
       "fault_category"
+    ],
+    "feature_labels": [
+      "경과연수",
+      "고장 심각도",
+      "운용중단 시간",
+      "수리 시간",
+      "교체 부품 수",
+      "정비 비용",
+      "정비 성공 여부",
+      "누적 비행시간",
+      "직전 정비 경과일",
+      "직전 정비 이력 공란",
+      "정비 월 주기(sin)",
+      "정비 월 주기(cos)",
+      "이전 관측 정비 수",
+      "이전 90일 정비 수",
+      "이전 90일 사후·긴급정비 수",
+      "이전 관측 고장 경과일",
+      "이전 관측 고장 존재",
+      "이전 예방정비 후 비행시간 증가",
+      "이전 예방정비 관측",
+      "이전 180일 정비 실패 수",
+      "드론 유형",
+      "정비 구분",
+      "고장 유형"
     ]
   },
   "data_sha256": {
@@ -132,12 +290,14 @@
     "data/drone_this_month.csv": "379631f03af5139d8a0c5c7278d812b7892da022a4d7650488eafe5ff564e346"
   },
   "code_sha256": {
-    "rdm_model.py": "b4f8dc47706360cc831c95d45d618b9842d136499fdb82b6905ca525eaf511b6",
-    "scripts/train.py": "2527e45a5364bc1ab74178c248b4984051d4fec635b782750a63be77c438099c",
+    "rdm_model.py": "2193819ab4bd9faf0ce9e38b73eaefffd51ddf2dd480be0688c0583f557f4ebd",
+    "scripts/train.py": "fe4f5ba6a88e377db5cfa95870120d433c74edc7f162f4dd48fd1d2dc8556d0a",
     "analysis_config.json": "e9f9bae4575a639e6ab8164d78a9537f0c7160b364b2b8cc420c060203b7937d"
   },
   "limitations": [
     "Educational synthetic data; performance is not evidence of operational safety or actual savings.",
+    "The later 2024 window was already inspected in earlier iterations; it is not fresh external validation of the revised workflow.",
+    "999-as-missing and hundredfold cost errors are user-directed assumptions, not verified data-generation rules. IQR repairs can suppress real high-cost events.",
     "Instructor test labels and grading unit are unavailable; no 2025 performance is reported.",
     "Refitting changes probability scale; the frozen development threshold may drift and needs prospective calibration.",
     "Monthly latest-record snapshots are retrospective month-end plans, not live daily dispatch decisions.",

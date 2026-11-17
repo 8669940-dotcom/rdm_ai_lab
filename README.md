@@ -9,10 +9,12 @@ Python 3.12 기준이다. 프로젝트 폴더의 PowerShell에서 실행한다.
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
-.\.venv\Scripts\python.exe -m streamlit run app.py
+.\.venv\Scripts\python.exe -m streamlit run app_styled.py --server.address=127.0.0.1 --server.port=8517
 ```
 
 분석 산출물이 Git에 포함되어 있어 앱 실행 시 재학습하지 않는다. API 키나 외부 데이터베이스는 필요 없다. `python`을 찾지 못하면 설치된 Python 실행 파일 또는 `py -3.12`를 사용한다. 가상환경 활성화 없이 위 실행 파일 경로로 실행할 수 있다.
+
+권장 진입점은 `app_styled.py`, 보고용 주소는 http://127.0.0.1:8517 이다. 기존 배포의 `app.py`도 같은 `rdm_ui.run_dashboard()`를 호출한다. 공통 화면은 `rdm_ui/dashboard.py`, 스타일은 `rdm_ui/readability.css`가 소유하며 분석 계산은 복제하지 않는다. [화면 모듈 안내](rdm_ui/README.md)를 참조한다.
 
 ## 분석 재현과 검증
 
@@ -28,7 +30,7 @@ python -m venv .venv
 
 ```powershell
 .\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
-.\.venv\Scripts\ty.exe check app.py app_helpers.py rdm_model.py scripts/train.py scripts/build_report.py scripts/build_briefing.py scripts/test_briefing.py
+.\.venv\Scripts\ty.exe check app.py app_styled.py rdm_ui app_helpers.py rdm_model.py scripts/train.py scripts/build_report.py scripts/build_briefing.py scripts/briefing_content.py scripts/test_analysis.py scripts/test_app.py scripts/test_briefing.py
 ```
 
 `check.py`는 원본 해시·데이터 계약·집계 재현과, 분석 결과가 있을 때 시간 경계·모델 예측 재현·앱 동작 테스트를 수행한다. 모델 성능은 저장된 내부 시간 검증 결과이며 실제 부대 안전성이나 예방 효과를 보증하지 않는다.
@@ -52,19 +54,23 @@ python -m venv .venv
 
 ## 지휘관 보고·발표 자료
 
-- [분석결과보고](reports/2026-01_분석결과보고.md): 이전 pdm 보고서 형식의 결론·품질·처리·모델·기준선·비용·한계 보고.
+- [분석결과보고](reports/2026-01_분석결과보고.md): **AI 활용 / 데이터 분석**으로 나눈 처리·12개 모델 구성·기준선·비용·영향 요인·한계 보고.
 - [5분 지휘관 발표 대본](reports/2026-01_지휘관발표스크립트.md): 화면 조작 순서·발표 대사·12개 예상 질의와 출처·시연 실패 대응.
 - [계산식·출처 대조표](reports/계산식_출처_대조표.md): F01–F17 산식, 실제 코드 함수·행 위치, 결과 JSON 필드와 공식 출처.
-- `reports/briefing_evidence.json`: AP·PR 면적·ROC·Brier의 독립 수식, 기준선·비용·개별 설명 및 순열 중요도 재검산 결과.
+- `reports/briefing_evidence.json`: AP·PR 면적·ROC·Brier의 독립 수식, N/A·비용 전후 값, 기준선·비용·개별 설명 및 순열 중요도 재검산 결과.
+- [N/A·비용 치환 감사 CSV](reports/cleaning_audit.csv): 분할 역할·원본 행·처리 전후 값·모델 중앙값 대체를 대조한다.
 - `python scripts/build_briefing.py`는 검산용 모델을 메모리에서만 재구성한다. 원본 CSV·저장 모델·기존 분석 산출물은 바꾸지 않는다. 보고서용 해시는 `reports/briefing_manifest.json`으로 확인한다.
 
 ## 분석 해석 기준
 
+- 시간 999·공란은 N/A, 수치는 학습 중앙값·결측 표시, 범주 공란은 N/A로 처리한다. 비용은 학습 1.5 IQR 밖만 후보로 삼고 100×Q3 초과는 100배 오류 가정 후 Q1~Q3 제한, 나머지 후보는 Q1~Q3 제한을 적용한다. 원본은 보존하며 이 가정이 실제 오류 확인을 뜻하지 않는다.
+- 4개 알고리즘 × 3개 피처 묶음을 동일한 새 전처리로 비교한다. 모델·피처 구성은 한글, 평가 용어는 Precision, Recall, True Positive Rate (TPR), False Positive Rate (FPR)를 사용한다.
 - 2024-01~05에서 모델·임계값을 선택하고 2024-07~12에서 고정 절차를 평가했다. 학습 경계에서는 30일 정답 관측 기간을 제외했다.
 - 2025년 예측 모델은 연초에 정답이 성숙한 학습 행으로 고정하고, 2026년 운영 모델은 제공된 학습 정답 전체를 사용한다. 시험 성능은 강사 채점 전에는 제시하지 않는다.
 - AP와 사다리꼴 PR-AUC를 구분한다. 월20대 운영은 고유 드론 최신 기록 기준이며 정비 기록별 상위20건 채점 지표도 별도 저장한다.
 - 위험 임계값과 정원은 독립적이다. `analysis_config.json`의 임계값 `null`은 검증 비용으로 자동 선정한다는 뜻이며 결과는 `analysis_results.json`의 `threshold_policies`가 소유한다.
 - 드론별 설명은 학습 참조값 치환 확률 민감도다. SHAP·합산 가중치·인과관계가 아니다. 최종 정비·운용 판단은 담당자가 한다.
+- 하반기는 이전 분석에서도 확인한 자료이므로 수정된 절차 전체의 새로운 외부 검증이 아니다. 과거 q99 결과와 검증 기록은 Git 이력·진행 기록에 구분하여 남긴다.
 
 ## 형상관리
 
