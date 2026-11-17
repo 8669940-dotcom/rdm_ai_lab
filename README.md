@@ -20,6 +20,7 @@ python -m venv .venv
 .\.venv\Scripts\python.exe scripts/profile_data.py
 .\.venv\Scripts\python.exe scripts/train.py
 .\.venv\Scripts\python.exe scripts/build_report.py
+.\.venv\Scripts\python.exe scripts/build_briefing.py
 .\.venv\Scripts\python.exe scripts/check.py --predictions reports/test_predictions_2025.csv
 ```
 
@@ -27,7 +28,7 @@ python -m venv .venv
 
 ```powershell
 .\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
-.\.venv\Scripts\ty.exe check app.py app_helpers.py rdm_model.py scripts/train.py scripts/build_report.py
+.\.venv\Scripts\ty.exe check app.py app_helpers.py rdm_model.py scripts/train.py scripts/build_report.py scripts/build_briefing.py scripts/test_briefing.py
 ```
 
 `check.py`는 원본 해시·데이터 계약·집계 재현과, 분석 결과가 있을 때 시간 경계·모델 예측 재현·앱 동작 테스트를 수행한다. 모델 성능은 저장된 내부 시간 검증 결과이며 실제 부대 안전성이나 예방 효과를 보증하지 않는다.
@@ -48,6 +49,14 @@ python -m venv .venv
 - [작업 진행·문제 해결 기록](reports/preparation_log.md)
 - [기계 판독 분석 결과](reports/analysis_results.json), [원본 점검](reports/data_profile.md), [검증 결과](reports/check_result.json)
 - 시험 채점 제출: `reports/test_predictions_2025.csv` (원본 1,241행·3열·정답 없음)
+
+## 지휘관 보고·발표 자료
+
+- [분석결과보고](reports/2026-01_분석결과보고.md): 이전 pdm 보고서 형식의 결론·품질·처리·모델·기준선·비용·한계 보고.
+- [5분 지휘관 발표 대본](reports/2026-01_지휘관발표스크립트.md): 화면 조작 순서·발표 대사·12개 예상 질의와 출처·시연 실패 대응.
+- [계산식·출처 대조표](reports/계산식_출처_대조표.md): F01–F17 산식, 실제 코드 함수·행 위치, 결과 JSON 필드와 공식 출처.
+- `reports/briefing_evidence.json`: AP·PR 면적·ROC·Brier의 독립 수식, 기준선·비용·개별 설명 및 순열 중요도 재검산 결과.
+- `python scripts/build_briefing.py`는 검산용 모델을 메모리에서만 재구성한다. 원본 CSV·저장 모델·기존 분석 산출물은 바꾸지 않는다. 보고서용 해시는 `reports/briefing_manifest.json`으로 확인한다.
 
 ## 분석 해석 기준
 

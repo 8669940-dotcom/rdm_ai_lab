@@ -1,0 +1,270 @@
+{
+  "passed": true,
+  "checked_at_utc": "2026-11-17T05:57:54.918054+00:00",
+  "tolerance_absolute": 1e-12,
+  "input_sha256": {
+    "README.txt": "215d19d4ed4e03228094ad7f787fd86d3ea0e6e6292b3f08f85d98271941185e",
+    "analysis_config.json": "e9f9bae4575a639e6ab8164d78a9537f0c7160b364b2b8cc420c060203b7937d",
+    "rdm_model.py": "b4f8dc47706360cc831c95d45d618b9842d136499fdb82b6905ca525eaf511b6",
+    "scripts/train.py": "2527e45a5364bc1ab74178c248b4984051d4fec635b782750a63be77c438099c",
+    "reports/analysis_results.json": "2df63a089f2b33eb03a646147d7b4e5952cac1f3e7e89570e89418056c279079",
+    "reports/validation_predictions_2024H2.csv": "3f2d10b7e46f4551e97527caba55a9b982eb589e1804a2a02bc26101f2f19730",
+    "reports/threshold_costs.csv": "f70d24d3068c3441b95d5b53a2f1ba19ec39f16306ec462ee666308b0578a16a",
+    "reports/data_profile.json": "dec58136a97b0b5e9683fccdf0f3df3de221e83b4edfeeeeac98b670af36d939",
+    "reports/monthly_validation.csv": "22fbeb2de1dd4634a493a3a151a1bdf5972b021b51240cbe457025933f019591",
+    "reports/eda_summary.csv": "97fcacaf5f63f1b97a9b330edc4beb6fe6e8b265e3f198bf2490ad51bfaefaee",
+    "artifacts/rdm_model.joblib": "7eef71b5a5dc5dd8271968e92fa791b70b6d59b8c90d4f47ca63281a016e86ee",
+    "artifacts/submission_model.joblib": "71df53d53cadd5c834e2ac5467e7697740fa5fad8aa8160f9163a3019fd0ac5b",
+    "data/drone_train.csv": "26c4d3711fd5c91dc183815af83ba5af6107b6470ae2d3660da2a50586136121",
+    "data/drone_test.csv": "5fa789dd8111ce5c3303e9a5c9f0694aec409a1c3a504574cc2ab2386ece7a7e",
+    "data/drone_this_month.csv": "379631f03af5139d8a0c5c7278d812b7892da022a4d7650488eafe5ff564e346"
+  },
+  "manual_holdout_metrics": {
+    "rows": 643,
+    "positives": 176,
+    "prevalence": 0.2737169517884914,
+    "ap": 0.7876711727063498,
+    "pr_auc_trapezoid": 0.7869522741756255,
+    "roc_auc": 0.8813874829667121,
+    "brier": 0.11184045004412485
+  },
+  "development_reconstruction": {
+    "rows": 511,
+    "positives": 114,
+    "prevalence": 0.22309197651663404,
+    "ap": 0.7157616351332275,
+    "pr_auc_trapezoid": 0.7148118054013132,
+    "roc_auc": 0.8224844226435105,
+    "brier": 0.11373147763659185
+  },
+  "reconstructed_policies": {
+    "300": {
+      "threshold": 0.40140788483944695,
+      "policy": "threshold",
+      "flagged": 111,
+      "true_positives": 74,
+      "false_negatives": 40,
+      "cost": 18660,
+      "miss_cost": 300,
+      "inspection_cost": 60,
+      "unit": "maintenance_record"
+    },
+    "600": {
+      "threshold": 0.22762209934496863,
+      "policy": "threshold",
+      "flagged": 182,
+      "true_positives": 87,
+      "false_negatives": 27,
+      "cost": 27120,
+      "miss_cost": 600,
+      "inspection_cost": 60,
+      "unit": "maintenance_record"
+    }
+  },
+  "monthly_recomputed": [
+    {
+      "month": "2024-07",
+      "unit": "latest_drone",
+      "candidates": 77,
+      "selected": 20,
+      "positives": 9,
+      "model_hits": 6,
+      "age_hits": 4,
+      "random_expected_hits": 2.3376623376623376,
+      "random_hits_mean": 2.357
+    },
+    {
+      "month": "2024-07",
+      "unit": "maintenance_record",
+      "candidates": 96,
+      "selected": 20,
+      "positives": 25,
+      "model_hits": 14,
+      "age_hits": 11,
+      "random_expected_hits": 5.208333333333333,
+      "random_hits_mean": 5.168
+    },
+    {
+      "month": "2024-08",
+      "unit": "latest_drone",
+      "candidates": 87,
+      "selected": 20,
+      "positives": 7,
+      "model_hits": 4,
+      "age_hits": 2,
+      "random_expected_hits": 1.6091954022988506,
+      "random_hits_mean": 1.595
+    },
+    {
+      "month": "2024-08",
+      "unit": "maintenance_record",
+      "candidates": 103,
+      "selected": 20,
+      "positives": 19,
+      "model_hits": 11,
+      "age_hits": 6,
+      "random_expected_hits": 3.6893203883495147,
+      "random_hits_mean": 3.691
+    },
+    {
+      "month": "2024-09",
+      "unit": "latest_drone",
+      "candidates": 79,
+      "selected": 20,
+      "positives": 14,
+      "model_hits": 10,
+      "age_hits": 6,
+      "random_expected_hits": 3.5443037974683542,
+      "random_hits_mean": 3.512
+    },
+    {
+      "month": "2024-09",
+      "unit": "maintenance_record",
+      "candidates": 98,
+      "selected": 20,
+      "positives": 30,
+      "model_hits": 15,
+      "age_hits": 7,
+      "random_expected_hits": 6.122448979591836,
+      "random_hits_mean": 6.135
+    },
+    {
+      "month": "2024-10",
+      "unit": "latest_drone",
+      "candidates": 89,
+      "selected": 20,
+      "positives": 6,
+      "model_hits": 5,
+      "age_hits": 2,
+      "random_expected_hits": 1.348314606741573,
+      "random_hits_mean": 1.403
+    },
+    {
+      "month": "2024-10",
+      "unit": "maintenance_record",
+      "candidates": 117,
+      "selected": 20,
+      "positives": 28,
+      "model_hits": 16,
+      "age_hits": 9,
+      "random_expected_hits": 4.786324786324786,
+      "random_hits_mean": 4.798
+    },
+    {
+      "month": "2024-11",
+      "unit": "latest_drone",
+      "candidates": 78,
+      "selected": 20,
+      "positives": 8,
+      "model_hits": 5,
+      "age_hits": 2,
+      "random_expected_hits": 2.051282051282051,
+      "random_hits_mean": 2.107
+    },
+    {
+      "month": "2024-11",
+      "unit": "maintenance_record",
+      "candidates": 101,
+      "selected": 20,
+      "positives": 28,
+      "model_hits": 17,
+      "age_hits": 7,
+      "random_expected_hits": 5.544554455445544,
+      "random_hits_mean": 5.545
+    },
+    {
+      "month": "2024-12",
+      "unit": "latest_drone",
+      "candidates": 87,
+      "selected": 20,
+      "positives": 12,
+      "model_hits": 8,
+      "age_hits": 2,
+      "random_expected_hits": 2.7586206896551726,
+      "random_hits_mean": 2.801
+    },
+    {
+      "month": "2024-12",
+      "unit": "maintenance_record",
+      "candidates": 128,
+      "selected": 20,
+      "positives": 46,
+      "model_hits": 20,
+      "age_hits": 10,
+      "random_expected_hits": 7.1875,
+      "random_hits_mean": 7.228
+    }
+  ],
+  "cost_rows_recomputed": 1028,
+  "permutation_features_reproduced": 23,
+  "eda_groups_recomputed": 22,
+  "calibration_bins_recomputed": [
+    {
+      "rows": 129,
+      "mean_predicted": 0.07261563194574766,
+      "observed_rate": 0.031007751937984496
+    },
+    {
+      "rows": 128,
+      "mean_predicted": 0.091113035104127,
+      "observed_rate": 0.046875
+    },
+    {
+      "rows": 129,
+      "mean_predicted": 0.13394376451781348,
+      "observed_rate": 0.13178294573643412
+    },
+    {
+      "rows": 128,
+      "mean_predicted": 0.3742555598150189,
+      "observed_rate": 0.375
+    },
+    {
+      "rows": 129,
+      "mean_predicted": 0.7571609995667051,
+      "observed_rate": 0.7829457364341085
+    }
+  ],
+  "example_drone": "DR-0115",
+  "example_factor_recomputed": [
+    {
+      "feature": "prior_maintenance_90d",
+      "label": "이전 90일 정비 수",
+      "value": 12,
+      "reference": 1.0,
+      "delta_probability": 0.167111906090868,
+      "original_probability": 0.9582364486647842,
+      "replaced_probability": 0.7911245425739162
+    },
+    {
+      "feature": "days_since_prior_fault",
+      "label": "이전 관측 고장 경과일",
+      "value": 1.0,
+      "reference": 65.0,
+      "delta_probability": 0.12769677398959156,
+      "original_probability": 0.9582364486647842,
+      "replaced_probability": 0.8305396746751926
+    },
+    {
+      "feature": "prior_faults_90d",
+      "label": "이전 90일 사후·긴급정비 수",
+      "value": 10,
+      "reference": 0.0,
+      "delta_probability": 0.12317170596362459,
+      "original_probability": 0.9582364486647842,
+      "replaced_probability": 0.8350647427011596
+    }
+  ],
+  "random_forest_parameters": {
+    "n_estimators": 240,
+    "criterion": "gini",
+    "max_depth": 6,
+    "min_samples_leaf": 8,
+    "max_features": "sqrt",
+    "bootstrap": true,
+    "class_weight": null,
+    "random_state": 42
+  },
+  "data_and_models_unchanged": true,
+  "generator_sha256": "98b56bcb9d681ac9a3bab999f94769f3fc867422574b1fed56f8d67587eb30f4"
+}

@@ -1,0 +1,91 @@
+{
+  "reviewed_date": "2026-11-17",
+  "implementation_version": {
+    "python": "3.12.10",
+    "pandas": "3.1.1",
+    "numpy": "2.5.5",
+    "scikit_learn": "1.9.1",
+    "streamlit": "1.67.0"
+  },
+  "project_sources": {
+    "D01": "README.txt: task, target, costs and capacity",
+    "D02": "analysis_results.json: executed model/metrics/policy",
+    "D03": "data_profile.json: observed quality counts",
+    "D04": "source functions linked in formula appendix"
+  },
+  "external_sources": {
+    "S01": {
+      "title": "RandomForestClassifier：확률 평균·분기 설정",
+      "url": "https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html"
+    },
+    "S02": {
+      "title": "Decision Trees：Gini 불순도와 분기 목적",
+      "url": "https://scikit-learn.org/stable/modules/tree.html#mathematical-formulation"
+    },
+    "S03": {
+      "title": "average_precision_score：AP 정의",
+      "url": "https://scikit-learn.org/stable/modules/generated/sklearn.metrics.average_precision_score.html"
+    },
+    "S04": {
+      "title": "auc：사다리꼴 면적",
+      "url": "https://scikit-learn.org/stable/modules/generated/sklearn.metrics.auc.html"
+    },
+    "S05": {
+      "title": "roc_auc_score：ROC 면적",
+      "url": "https://scikit-learn.org/stable/modules/generated/sklearn.metrics.roc_auc_score.html"
+    },
+    "S06": {
+      "title": "brier_score_loss：이진 확률 제곱오차",
+      "url": "https://scikit-learn.org/stable/modules/generated/sklearn.metrics.brier_score_loss.html"
+    },
+    "S07": {
+      "title": "Permutation importance：반복 셔플 중요도",
+      "url": "https://scikit-learn.org/stable/modules/permutation_importance.html"
+    },
+    "S08": {
+      "title": "NumPy quantile：선형 분위수",
+      "url": "https://numpy.org/doc/stable/reference/generated/numpy.quantile.html"
+    },
+    "S09": {
+      "title": "pandas Series.quantile：운영 상한 계산 API",
+      "url": "https://pandas.pydata.org/docs/reference/api/pandas.Series.quantile.html"
+    },
+    "S10": {
+      "title": "SimpleImputer：학습 중앙값·결측 표시",
+      "url": "https://scikit-learn.org/stable/modules/generated/sklearn.impute.SimpleImputer.html"
+    },
+    "S11": {
+      "title": "StandardScaler：평균·표준편차 변환",
+      "url": "https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html"
+    },
+    "S12": {
+      "title": "TimeSeriesSplit：시간 순서와 gap 개념",
+      "url": "https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.TimeSeriesSplit.html"
+    },
+    "S13": {
+      "title": "LogisticRegression：이진 확률과 규제 설정",
+      "url": "https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html"
+    },
+    "S14": {
+      "title": "HistGradientBoostingClassifier：손실·학습률·트리 설정",
+      "url": "https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.HistGradientBoostingClassifier.html"
+    },
+    "S15": {
+      "title": "LightGBM LGBMClassifier：비교 모델 API",
+      "url": "https://lightgbm.readthedocs.io/en/stable/pythonapi/lightgbm.LGBMClassifier.html"
+    },
+    "S16": {
+      "title": "LightGBM Parameters：이진 목적함수·학습 설정",
+      "url": "https://lightgbm.readthedocs.io/en/stable/Parameters.html"
+    },
+    "S17": {
+      "title": "calibration_curve：분위수 구간별 평균 확률·관측 비율",
+      "url": "https://scikit-learn.org/stable/modules/generated/sklearn.calibration.calibration_curve.html"
+    },
+    "S18": {
+      "title": "OneHotEncoder：범주 지시열·미관측 범주 처리",
+      "url": "https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.OneHotEncoder.html"
+    }
+  },
+  "scope": "Official algorithm/API definitions. Costs, q99, history windows and model configuration are educational assumptions or project choices, not military standards."
+}
